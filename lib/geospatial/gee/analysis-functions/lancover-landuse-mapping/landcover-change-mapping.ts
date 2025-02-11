@@ -11,6 +11,7 @@ interface LandCoverChangeResult {
   extraDescription: string;
 }
 
+// The 9 DW classes for "label" interpretation
 const DW_LABELS = [
   "Water",
   "Trees",
@@ -23,6 +24,7 @@ const DW_LABELS = [
   "Snow & Ice",
 ];
 
+// The 9 DW palette colors
 const DW_PALETTE = [
   "#419BDF", // Water
   "#397D49", // Trees
@@ -37,6 +39,9 @@ const DW_PALETTE = [
 
 const PROB_THRESHOLD = 0.5;
 
+/**
+ * Compute class distribution (0..8 => class names)
+ */
 async function computeClassDistribution(
   image: any,
   geometry: any
@@ -73,6 +78,11 @@ async function computeClassDistribution(
   });
 }
 
+/**
+ * Returns:
+ * 1) A tile for changed (1) vs. unchanged (0).
+ * 2) mapStats with changed/unchanged percentages + class distributions.
+ */
 export default async function landcoverChangeMapping(
   geometry: any,
   startDate1: string,
@@ -86,6 +96,7 @@ export default async function landcoverChangeMapping(
     throw new Error("Unauthenticated!");
   }
 
+  // 2) Filter the Dynamic World collection with a probability mask.
   const fromCollection = ee
     .ImageCollection("GOOGLE/DYNAMICWORLD/V1")
     .filterBounds(geometry)
@@ -126,11 +137,14 @@ export default async function landcoverChangeMapping(
       return img.updateMask(maxProb.gte(PROB_THRESHOLD));
     });
 
+  // 3) Create mode images for each period
   const fromImage = fromCollection.select("label").mode().clip(geometry);
   const toImage = toCollection.select("label").mode().clip(geometry);
 
+  // 4) Build changed vs. unchanged image (0 => same, 1 => different)
   const changeImage = fromImage.neq(toImage).rename("label");
 
+  // 5) Frequency histogram (changed vs. unchanged)
   const changeHistogram = changeImage
     .reduceRegion({
       reducer: ee.Reducer.frequencyHistogram(),
@@ -154,11 +168,13 @@ export default async function landcoverChangeMapping(
     }
   });
 
+  // 6) Compute distributions
   const [year1Distribution, year2Distribution] = await Promise.all([
     computeClassDistribution(fromImage, geometry),
     computeClassDistribution(toImage, geometry),
   ]);
 
+  // 7) Visualization (0 => gray, 1 => red)
   const palette = ["#aaaaaa", "#ff0000"];
   const visualization = {
     min: 0,
@@ -166,10 +182,12 @@ export default async function landcoverChangeMapping(
     palette,
   };
 
+  // 8) Build tile & geometry
   const { urlFormat } = (await getMapId(changeImage, visualization)) as any;
   const imageGeom = changeImage.geometry();
   const imageGeometryGeojson = await evaluate(imageGeom);
 
+  // 9) Minimal legend for changed vs. unchanged
   const legendConfig: any = {
     labelNames: ["Unchanged", "Changed"],
     labelNamesStats: DW_LABELS,
@@ -177,6 +195,7 @@ export default async function landcoverChangeMapping(
     statsPalette: DW_PALETTE,
   };
 
+  // 10) Combine stats
   const mapStats = {
     changedPercentage: changedPct,
     unchangedPercentage: unchangedPct,
