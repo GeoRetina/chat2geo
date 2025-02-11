@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { Analytics } from "@vercel/analytics/next";
 import { getUserProfile } from "./actions/get-user-profile";
 import ClientWrapper from "@/components/client-wrapper";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -38,10 +39,14 @@ export default async function RootLayout({
   const userProfile = await getUserProfile();
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} font-sans`}>
-        <ClientWrapper userProfile={userProfile}>{children}</ClientWrapper>
-        <Analytics />
-      </body>
+      <TooltipProvider>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} font-sans`}
+        >
+          <ClientWrapper userProfile={userProfile}>{children}</ClientWrapper>
+          <Analytics />
+        </body>
+      </TooltipProvider>
     </html>
   );
 }
