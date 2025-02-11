@@ -11,8 +11,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeModeToggle } from "@/components/ui/theme-mode-toggle";
 import { Label } from "@/components/ui/label";
+import { Tooltip } from "react-tooltip";
 
-const appVersion = process.env.NEXT_PUBLIC_APP_VERSION ?? "0.0.0";
+const appVersion = process.env.NEXT_PUBLIC_APP_VERSION;
 
 const AppSettings = () => {
   const isSidebarCollapsed = useButtonsStore(
@@ -71,6 +72,21 @@ const AppSettings = () => {
           </div>
         </DropdownMenuContent>
       </DropdownMenu>
+      <Tooltip
+        id="settings"
+        place="right"
+        style={{
+          backgroundColor: "white",
+          color: "black",
+          position: "fixed",
+          zIndex: 9999,
+          padding: "8px",
+          borderRadius: "4px",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
+          fontWeight: "500",
+        }}
+        hidden={!isSidebarCollapsed}
+      />
     </section>
   );
 };
