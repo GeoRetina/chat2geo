@@ -1,6 +1,6 @@
 import React from "react";
 import { IconTrash } from "@tabler/icons-react";
-import { useAttachmentStore } from "@/features/chat/stores/useAttachmentsStore";
+import { useAttachmentStore } from "@/features/chat/stores/use-attachments-store";
 
 const formatFileSize = (bytes: number): string => {
   if (bytes < 1024) return bytes + " B";

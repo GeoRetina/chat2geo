@@ -15,7 +15,7 @@ import { useSWRConfig } from "swr";
 import { Tooltip } from "react-tooltip";
 
 import { transformMetadataToCitations } from "@/features/knowledge-base/utils/transform-metadata-to-citation";
-import useChatResponseSourcesStore from "@/features/chat/stores/useChatResponseSourcesStore";
+import useChatResponseSourcesStore from "@/features/chat/stores/use-chat-response-sources-store";
 import { useGeeOutputStore } from "@/features/maps/stores/use-gee-ouput-store";
 import useFunctionStore from "@/features/maps/stores/use-function-store";
 import useMapLayersStore from "@/features/maps/stores/use-map-layer-store";

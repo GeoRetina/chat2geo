@@ -18,9 +18,9 @@ import useMapLayersStore from "@/features/maps/stores/use-map-layer-store";
 import useZoomRequestStore from "@/features/maps/stores/use-map-zoom-request-store";
 import useMapLegendStore from "@/features/maps/stores/use-map-legend-store";
 import useTableStore from "@/features/maps/stores/use-table-store";
-import { useAttachmentStore } from "@/features/chat/stores/useAttachmentsStore";
-import useChatSourcesStore from "@/features/chat/stores/useChatResponseSourcesStore";
-import useDraftedReportStore from "@/features/chat/stores/useDraftedReportStore";
+import { useAttachmentStore } from "@/features/chat/stores/use-attachments-store";
+import useChatSourcesStore from "@/features/chat/stores/use-chat-response-sources-store";
+import useDraftedReportStore from "@/features/chat/stores/use-drafted-report-store";
 import { useButtonsStore } from "@/stores/use-buttons-store";
 
 export function resetChatStores() {

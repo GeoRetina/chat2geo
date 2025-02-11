@@ -8,7 +8,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { useAttachmentStore } from "@/features/chat/stores/useAttachmentsStore";
+import { useAttachmentStore } from "@/features/chat/stores/use-attachments-store";
 import useROIStore from "@/features/maps/stores/use-roi-store";
 import { Separator } from "@/components/ui/separator";
 import { removeExtension } from "@/utils/general/general-utils";

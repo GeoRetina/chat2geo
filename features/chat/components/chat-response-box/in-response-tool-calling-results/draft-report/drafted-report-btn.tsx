@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import useDraftedReportStore from "@/features/chat/stores/useDraftedReportStore";
+import useDraftedReportStore from "@/features/chat/stores/use-drafted-report-store";
 import { IconClipboardText } from "@tabler/icons-react";
 
 interface DraftedReportBtnProps {
@@ -13,8 +13,6 @@ const DraftedReportBtn = ({
   const setDraftedReport = useDraftedReportStore(
     (state) => state.setDraftedReport
   );
-
-  // const reportFileName = useDraftedReportStore((state) => state.reportFileName);
 
   const handleClick = () => {
     setDraftedReport(report);

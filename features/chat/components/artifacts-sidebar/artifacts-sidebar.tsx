@@ -1,11 +1,10 @@
 "use client";
 import React, { use, useEffect } from "react";
-import { IconArrowNarrowRight, IconFile } from "@tabler/icons-react";
 import { useButtonsStore } from "@/stores/use-buttons-store";
 import MapContainer from "@/features/maps/components/map-container";
 import useMapDisplayStore from "@/features/maps/stores/use-map-display-store";
 import GenerateReport from "../chat-response-box/in-response-tool-calling-results/draft-report/draft-report";
-import useDraftedReportStore from "@/features/chat/stores/useDraftedReportStore";
+import useDraftedReportStore from "@/features/chat/stores/use-drafted-report-store";
 import useROIStore from "@/features/maps/stores/use-roi-store";
 import { Button } from "@/components/ui/button";
 import { MoveRight } from "lucide-react";
