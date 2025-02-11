@@ -10,11 +10,11 @@ import {
 import { useButtonsStore } from "@/stores/use-buttons-store";
 import useMapDisplayStore from "@/features/maps/stores/use-map-display-store";
 import useTableStore from "../../stores/use-table-store";
+import AddressSearch from "../address-search";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
@@ -27,9 +27,7 @@ const MapCustomControls = () => {
   const toggleMapChartPanel = useMapDisplayStore(
     (state) => state.toggleMapChartPanel
   );
-
   const toggleTable = useTableStore((state) => state.toggleTable);
-
   const toggleBasemap = useButtonsStore((state) => state.toggleBasemap);
 
   const buttons = [
@@ -83,27 +81,47 @@ const MapCustomControls = () => {
     },
   ];
 
+  const firstGroup = buttons.slice(0, 3);
+  const secondGroup = buttons.slice(3);
+
   return (
-    <TooltipProvider>
-      <div className="flex justify-center items-center gap-4 bg-foreground/30 border border-stone-600 w-fit p-2 h-fit rounded-2xl">
-        {buttons.map((button) => (
-          <Tooltip key={button.id}>
-            <TooltipTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="bg-background rounded-xl [&_svg]:size-5"
-                onClick={button.onClick}
-                disabled={button.active}
-              >
-                {button.icon}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">{button.tooltip}</TooltipContent>
-          </Tooltip>
-        ))}
-      </div>
-    </TooltipProvider>
+    <div className="flex justify-center items-center gap-4 bg-foreground/30 border border-stone-600 w-fit p-2 h-fit rounded-2xl">
+      {firstGroup.map((button) => (
+        <Tooltip key={button.id}>
+          <TooltipTrigger asChild>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="bg-background rounded-xl [&_svg]:size-5"
+              onClick={button.onClick}
+              disabled={button.active}
+            >
+              {button.icon}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="top">{button.tooltip}</TooltipContent>
+        </Tooltip>
+      ))}
+
+      <AddressSearch />
+
+      {secondGroup.map((button) => (
+        <Tooltip key={button.id}>
+          <TooltipTrigger asChild>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="bg-background rounded-xl [&_svg]:size-5"
+              onClick={button.onClick}
+              disabled={button.active}
+            >
+              {button.icon}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="top">{button.tooltip}</TooltipContent>
+        </Tooltip>
+      ))}
+    </div>
   );
 };
 

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useButtonsStore } from "@/stores/use-buttons-store";
 import useROIStore from "@/features/maps/stores/use-roi-store";
-
+import AddressSearch from "../address-search";
 import { Button } from "@/components/ui/button";
 import InputTextConfirm from "@/components/ui/input-text-confirm";
 import { Layers, SquareMousePointer } from "lucide-react";
@@ -11,7 +11,6 @@ import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
-  TooltipProvider,
 } from "@/components/ui/tooltip";
 
 const MapRoiControls = () => {
@@ -41,61 +40,60 @@ const MapRoiControls = () => {
       : "Select a location on the map";
 
   return (
-    // 3) Wrap everything in <TooltipProvider>
-    <TooltipProvider>
-      <div className="flex justify-center items-center gap-4 bg-foreground/30 bg-opacity-60 w-fit p-2 h-fit rounded-2xl">
-        {isSelectRoiNameOpen && (
-          <InputTextConfirm
-            isOpen={isSelectRoiNameOpen}
-            onClose={() => setIsSelectRoiNameOpen(false)}
-            onSubmit={handleRoiFinalize}
-            title="Enter ROI Name"
-          />
-        )}
+    <div className="flex justify-center items-center gap-4 bg-foreground/30 bg-opacity-60 w-fit p-2 h-fit rounded-2xl">
+      {isSelectRoiNameOpen && (
+        <InputTextConfirm
+          isOpen={isSelectRoiNameOpen}
+          onClose={() => setIsSelectRoiNameOpen(false)}
+          onSubmit={handleRoiFinalize}
+          title="Enter ROI Name"
+        />
+      )}
 
-        {isRoiCreated && (
+      {isRoiCreated && (
+        <Button
+          size="sm"
+          variant="warning"
+          className="font-semibold text-gray-800"
+          onClick={handleRoiConfirm}
+        >
+          Finalize ROI
+        </Button>
+      )}
+
+      {/* 4) “Draw Polygon” Button + Tooltip */}
+      <Tooltip>
+        <TooltipTrigger asChild>
           <Button
-            size="sm"
-            variant="warning"
-            className="font-semibold text-gray-800"
-            onClick={handleRoiConfirm}
+            size="icon"
+            variant="ghost"
+            className="bg-background [&_svg]:size-5"
+            onClick={() => setDrawingMode("draw_polygon")}
+            disabled={activeDrawingMode === "draw_polygon"}
           >
-            Finalize ROI
+            <SquareMousePointer className="text-foreground" />
           </Button>
-        )}
+        </TooltipTrigger>
+        <TooltipContent>{polygonButtonTooltip}</TooltipContent>
+      </Tooltip>
 
-        {/* 4) “Draw Polygon” Button + Tooltip */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="bg-background [&_svg]:size-5"
-              onClick={() => setDrawingMode("draw_polygon")}
-              disabled={activeDrawingMode === "draw_polygon"}
-            >
-              <SquareMousePointer className="text-foreground" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>{polygonButtonTooltip}</TooltipContent>
-        </Tooltip>
+      <AddressSearch />
 
-        {/* 5) “Toggle Basemap” Button + Tooltip */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className="bg-background [&_svg]:size-5"
-              variant="ghost"
-              size="icon"
-              onClick={toggleBasemap}
-            >
-              <Layers className="text-foreground" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Toggle basemap</TooltipContent>
-        </Tooltip>
-      </div>
-    </TooltipProvider>
+      {/* 5) “Toggle Basemap” Button + Tooltip */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            className="bg-background [&_svg]:size-5"
+            variant="ghost"
+            size="icon"
+            onClick={toggleBasemap}
+          >
+            <Layers className="text-foreground" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Toggle basemap</TooltipContent>
+      </Tooltip>
+    </div>
   );
 };
 
