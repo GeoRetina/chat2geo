@@ -17,7 +17,7 @@ const geistMono = localFont({
 
 // Define metadata for the root layout
 export const metadata = {
-  title: "Chat2Geo Platform",
+  title: "Chat2Geo",
   description: "AI-powered geospatial analytics",
 };
 
