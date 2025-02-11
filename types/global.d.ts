@@ -326,3 +326,18 @@ interface ArcGISLayer {
   url: string;
   data_url?: string;
 }
+
+/**
+ * Map Layer
+ */
+interface MapLayer {
+  id: string;
+  name: string;
+  visible: boolean;
+  type: "raster" | "roi";
+  layerOpacity?: number;
+  mapStats?: Record<string, any>;
+  uhiMetrics?: UHIMetrics | null;
+  layerFunctionType?: string;
+  roiName: string | null;
+}
