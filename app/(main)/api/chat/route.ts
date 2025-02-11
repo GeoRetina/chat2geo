@@ -105,9 +105,9 @@ export async function POST(request: Request) {
   });
 
   // System instructions
-  const systemInstructions = `You are an AI Assistant specializing in geospatial analytics for climate change. Today is ${getFormattedDate()}. 
-  Be kind, warm, and professional. Use emojis where appropriate to enhance user experience. 
-  When user asks for a geospatial analysis, never ask for the location unless you run the analysis and you get a corresponding error.
+  const systemInstructions = `You are an AI Assistant specializing in geospatial analytics for climate change. Today is ${getFormattedDate()}.
+  Be kind, warm, and professional. Use emojis where appropriate to enhance user experience.
+  When user asks for a geospatial analysis, never ask for the location unless you run the analysis and you get a corresponding error. Users provide the name of the region of interest (ROI) layer in the request.
   Always highlight important outputs and provide help in interpreting results. Don't include URLs or legends in your responses.
   Refuse to answer questions irrelevant to geospatial analytics or the platform's context. You have access to several tools. If running a tool fails, don't re-run it. Instead, provide a clear explanation to the user.
   IF USER ASKS FOR DRAFTING REPORTS, YOU SHOULD RUN THE "draftReport" TOOL, AND JUST CONFIRM THE DRAFTING OF THE REPORT. YOU SHOULD NOT EVER DRAFT REPORT IN THE CHAT."
@@ -225,76 +225,6 @@ export async function POST(request: Request) {
             maxArea,
           }),
       },
-      requestLoadingGeospatialData: {
-        description: `The user has requested loading geospatial data. You should run the appropriate analysis without asking the user for sending you the shapefile. You should not ask the user for the shapefile. You should run the analysis based on the user's request.`,
-        parameters: z.object({
-          geospatialDataType: z.string().describe(
-            `The type of geospatial data to load. It can be one of the following:
-            'Load GEE Data'`
-          ),
-          selectedRoiGeometry: z
-            .object({
-              type: z.string().optional(),
-              coordinates: z.array(z.array(z.array(z.number()))).optional(),
-            })
-            .optional()
-            .describe(
-              "The selected region of interest (ROI) geometry. You should run the analysis based on the user's request."
-            ),
-          datasetId: z.string().describe("The ID of the GEE dataset to load."),
-          startDate: z
-            .string()
-            .describe(
-              "The start date for the data to load. The date format should be 'YYYY-MM-DD'. But convert any other date format the user gives you to that one."
-            ),
-          endDate: z
-            .string()
-            .describe(
-              "The end date for the data to load. The date format should be 'YYYY-MM-DD'. But convert any other date format the user gives you to that one."
-            ),
-          visParams: z.union([
-            // single-band case
-            z.object({
-              palette: z.array(z.string()),
-              min: z.number().optional(),
-              max: z.number().optional(),
-            }),
-            // multi-band case
-            z.object({
-              bands: z.array(z.string()),
-              min: z.number().optional(),
-              max: z.number().optional(),
-            }),
-          ]).describe(`
-              For single-band data, use { palette: [...], min, max }.
-              For multi-band data (like RGB), use something like { bands: ['R', 'G', 'B'], min, max }. For Landsat SR data, the band names are like SR_B1, etc..
-            `),
-          labelNames: z
-            .array(z.string())
-            .describe(
-              "The label names for the data to load. You should run the analysis based on the user's request. Choose the closet label names even if it doesn't 100% match what you already know. Infer it."
-            ),
-          layerName: z
-            .string()
-            .describe(
-              "The name of the layer to be displayed. You ask the user about it if they don't provide it. Otherwise, use a name based on the function type, but make sure the name is concise and descriptive. "
-            ),
-          title: z
-            .string()
-            .optional()
-            .describe(
-              "Briefly describe the title of the analysis in one sentence confirming you're working on the user's request."
-            ),
-        }),
-        execute: async (args) => {
-          return requestLoadingGeospatialData({
-            ...args,
-            cookieStore,
-            selectedRoiGeometryInChat,
-          });
-        },
-      },
-
       requestRagQuery: {
         description: `The user has some documents with which a RAG has been built. If you're asked a question that you didn't know the answer, run the requestRagQuery tool that is based on user's documents to get the answer.`,
         parameters: z.object({
@@ -332,7 +262,7 @@ export async function POST(request: Request) {
       },
       checkMapLayersNames: {
         description:
-          "Here are the the names of the current map layers. If you run a geospatial analysis, and you select a name fo the layer, you should should first check the layer names to make sure the name you selected is not already in use.",
+          "Your need to select a name for the geospatial analysis to be performed. Here are the the names of the current map layers. If you run a geospatial analysis, and you select a name fo the layer, you should should first check the layer names to make sure the name you selected is not already in use.",
         parameters: z.object({
           layerName: z
             .string()
@@ -353,6 +283,7 @@ export async function POST(request: Request) {
 // Implement the tools
 ///////////////////////////////////////////////////////////////
 
+// Tool to request a geospatial analysis
 async function requestGeospatialAnalysis(args: any) {
   const {
     functionType,
@@ -479,116 +410,6 @@ async function requestGeospatialAnalysis(args: any) {
   }
 }
 
-async function requestLoadingGeospatialData(args: any) {
-  const {
-    geospatialDataType,
-    selectedRoiGeometryInChat,
-    datasetId,
-    layerName,
-    title,
-    startDate,
-    endDate,
-    visParams,
-    labelNames,
-    cookieStore,
-  } = args;
-
-  const selectedRoiGeometry = selectedRoiGeometryInChat?.geometry;
-
-  if (!selectedRoiGeometry) {
-    return {
-      error:
-        "It seems you didn't provide a valid region of interest (ROI). You need to provide an ROI through importing a shapefile/geojson file or drawing a shape on the map.",
-    };
-  }
-
-  if (
-    selectedRoiGeometry.type !== "Polygon" &&
-    selectedRoiGeometry.type !== "MultiPolygon" &&
-    selectedRoiGeometry.type !== "FeatureCollection"
-  ) {
-    return {
-      error:
-        "Selected ROI geometry must be a Polygon, MultiPolygon, or a FeatureCollection of polygons.",
-    };
-  }
-
-  if (selectedRoiGeometry.type === "FeatureCollection") {
-    for (const feature of selectedRoiGeometry.features) {
-      if (
-        !feature.geometry ||
-        (feature.geometry.type !== "Polygon" &&
-          feature.geometry.type !== "MultiPolygon")
-      ) {
-        return {
-          error: "All features in the ROI must be polygons.",
-        };
-      }
-    }
-  }
-
-  const url = new URL(
-    "/api/gee/request-loading-geospatial-data",
-    process.env.BASE_URL
-  );
-
-  const payload = {
-    geospatialDataType,
-    datasetId,
-    startDate,
-    endDate,
-    visParams,
-    labelNames,
-    selectedRoiGeometry,
-  };
-
-  try {
-    const response = await fetch(url.toString(), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        cookie: cookieStore || "",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error(
-        "Error during fetch:",
-        errorData.error || response.statusText
-      );
-      return {
-        error: "Failed to load geospatial data.",
-      };
-    }
-
-    const data = await response.json();
-
-    if (!data.urlFormat || Object.keys(data.mapStats).length === 0) {
-      return {
-        error: "Something went wrong! Failed to load geospatial data.",
-      };
-    }
-
-    return {
-      ...data,
-      layerName,
-      title,
-      datasetId,
-      startDate,
-      endDate,
-      geospatialDataType,
-      selectedRoiGeometry: selectedRoiGeometryInChat,
-    };
-  } catch (error) {
-    console.error("Error during fetch:", error);
-    return {
-      error: "Failed to load geospatial data.",
-    };
-  }
-}
-
 // Tool to request a RAG query
 async function requestRagQuery(args: any) {
   const { query, title } = args; // Extract query parameter from arguments
@@ -618,7 +439,7 @@ async function draftReport(args: any) {
     // Create a prompt that focuses on synthesizing the existing conversation
     const reportPrompt = {
       role: "user",
-      content: `Please draft a comprehensive report based on our previous conversation and analyses. The report should NOT inlcude your own comments. 
+      content: `Please draft a comprehensive report based on our previous conversation and analyses. The report should NOT inlcude your own comments.
           Format it with the following structure:
           - Introduction: Brief context and purpose
           - Analyses Performed: Summary of conducted analyses
@@ -631,7 +452,8 @@ async function draftReport(args: any) {
     const conversationContext = [...relevantMessages, reportPrompt];
 
     const reportResponse = await generateText({
-      model: azure("gpt-4o"),
+      model: openai("gpt-4o"),
+      // model: azure("gpt-4o"),
       messages: convertToCoreMessages(conversationContext),
       tools: {}, // Empty tools object since we don't need tools for report generation
     });
