@@ -10,28 +10,29 @@ import React, {
 
 import { ToolInvocation } from "ai";
 import { useChat } from "ai/react";
+import ChatInputBox from "../input/chat-input-box";
 import { IconDeviceAnalytics } from "@tabler/icons-react";
-import { useSWRConfig } from "swr";
-import { Tooltip } from "react-tooltip";
-
-import { transformMetadataToCitations } from "@/features/knowledge-base/utils/transform-metadata-to-citation";
-import useChatResponseSourcesStore from "@/features/chat/stores/use-chat-response-sources-store";
 import { useGeeOutputStore } from "@/features/maps/stores/use-gee-ouput-store";
+import useChatResponseSourcesStore from "@/features/chat/stores/use-chat-response-sources-store";
+import { useButtonsStore } from "@/stores/use-buttons-store";
+import ChatMessage from "./chat-message/chat-message";
 import useFunctionStore from "@/features/maps/stores/use-function-store";
 import useMapLayersStore from "@/features/maps/stores/use-map-layer-store";
-import useMapLegendStore from "@/features/maps/stores/use-map-legend-store";
-import useMapDisplayStore from "@/features/maps/stores/use-map-display-store";
+import ArtifactsSidebar from "../artifacts-sidebar/artifacts-sidebar";
+import { useSWRConfig } from "swr";
+import { transformMetadataToCitations } from "@/features/knowledge-base/utils/transform-metadata-to-citation";
 import useROIStore from "@/features/maps/stores/use-roi-store";
-import { useButtonsStore } from "@/stores/use-buttons-store";
+import useMapDisplayStore from "@/features/maps/stores/use-map-display-store";
+import useMapLegendStore from "@/features/maps/stores/use-map-legend-store";
+import { checkUserUsageInChat, generateUUID } from "../../utils/general-utils";
 import { useUserStore } from "@/stores/use-user-profile-store";
 import useToastMessageStore from "@/stores/use-toast-message-store";
-
-import ChatInputBox from "../input/chat-input-box";
-import ArtifactsSidebar from "../artifacts-sidebar/artifacts-sidebar";
-import ChatMessage from "./chat-message/chat-message";
 import { CapabilitiesBanner } from "./capabilities-banner";
-
-import { checkUserUsageInChat, generateUUID } from "../../utils/general-utils";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 interface MessageCompletionState {
   isComplete: boolean;
@@ -57,42 +58,10 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
   const usageRequests = useUserStore((state) => state.usageRequests);
   const maxRequests = useUserStore((state) => state.maxRequests);
   const maxArea = useUserStore((state) => state.maxArea);
-
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
-    useChat({
-      experimental_throttle: 100,
-      onToolCall: (message) => {
-        setToolCallTitle((message.toolCall.args as any).title);
-      },
-      initialMessages: initialMessages,
-
-      body: {
-        id: chatId,
-        selectedRoiGeometryInChat: selectedRoiGeometryInChat,
-      },
-
-      onFinish: (message) => {
-        mutate("/api/chat-history");
-        useUserStore.getState().fetchAndSetUsage();
-        // When a message finishes, track its tool call IDs
-        const toolCallIds =
-          message.toolInvocations?.map(
-            (toolInvocation: ToolInvocation) => toolInvocation.toolCallId
-          ) || [];
-
-        setPendingToolCallIds((prev) => {
-          const newSet = new Set(prev);
-          toolCallIds.forEach((id) => newSet.add(id));
-          return newSet;
-        });
-
-        // Check completion state after tool results are processed
-        checkMessageCompletionState(message);
-      },
-    });
-
   const addMapLayer = useMapLayersStore((state) => state.addMapLayer);
-
+  const getMapLayersNames = useMapLayersStore(
+    (state) => state.getMapLayerNames
+  );
   const addLegend = useMapLegendStore((state) => state.addLegend);
   const setDisplayRawMapRequestedFromInsightsViewerIcon = useMapDisplayStore(
     (state) => state.setDisplayRawMapRequestedFromInsightsViewerIcon
@@ -140,6 +109,40 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
     [key: string]: Set<string>;
   }>({});
   const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(true);
+
+  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+    useChat({
+      experimental_throttle: 100,
+      onToolCall: (message) => {
+        setToolCallTitle((message.toolCall.args as any).title);
+      },
+      initialMessages: initialMessages,
+
+      body: {
+        id: chatId,
+        selectedRoiGeometryInChat: selectedRoiGeometryInChat,
+        mapLayersNames: getMapLayersNames(),
+      },
+
+      onFinish: (message) => {
+        mutate("/api/chat-history");
+        useUserStore.getState().fetchAndSetUsage();
+        // When a message finishes, track its tool call IDs
+        const toolCallIds =
+          message.toolInvocations?.map(
+            (toolInvocation: ToolInvocation) => toolInvocation.toolCallId
+          ) || [];
+
+        setPendingToolCallIds((prev) => {
+          const newSet = new Set(prev);
+          toolCallIds.forEach((id) => newSet.add(id));
+          return newSet;
+        });
+
+        // Check completion state after tool results are processed
+        checkMessageCompletionState(message);
+      },
+    });
 
   const handleSendMessage = useCallback(() => {
     if (!isChatStarted) {
@@ -282,6 +285,9 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
         const lastMessageId = lastAssistantMessage.id;
 
         switch (toolName) {
+          /////////////////////////////////////////////////////////////////////////
+          // Handle Geospatial ANALYSIS
+          /////////////////////////////////////////////////////////////////////////
           case "requestGeospatialAnalysis": {
             const {
               urlFormat,
@@ -300,6 +306,7 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
             } = result;
 
             startTransition(() => {
+              // Add the result to the message state
               setMessageResults((prev) => ({
                 ...prev,
                 [lastMessageId]: {
@@ -323,7 +330,6 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
                 uhiMetrics,
               });
 
-              // if the map is cached in the assets path, add it to the store (e.g., land cover map)
               if (tempCreatedMapInAssetsPath) {
                 addGeeTempMapInAssetsPath(
                   layerName,
@@ -331,6 +337,7 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
                 );
               }
 
+              // Save analysis config
               addFunctionConfig({
                 functionType,
                 layerName,
@@ -343,6 +350,7 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
                 legendConfig,
               });
 
+              // Add a map layer
               addMapLayer({
                 id: generateUUID(),
                 layerFunctionType: functionType,
@@ -354,14 +362,20 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
                 roiName: selectedRoiGeometry?.name || "",
               });
 
+              // Add legend
               addLegend(layerName, legendConfig);
             });
             break;
           }
 
+          /////////////////////////////////////////////////////////////////////////
+          // Handle RAG QUERY
+          /////////////////////////////////////////////////////////////////////////
           case "requestRagQuery": {
             let sources = result.data;
-
+            // sources = sources.map((source: any) => {
+            //   source.metada;
+            // });
             const citations = transformMetadataToCitations(sources);
             startTransition(() => {
               setMessageResults((prev) => ({
@@ -377,6 +391,9 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
             break;
           }
 
+          /////////////////////////////////////////////////////////////////////////
+          // Handle DRAFT REPORT
+          /////////////////////////////////////////////////////////////////////////
           case "draftReport": {
             const { report, reportFileName } = result;
             startTransition(() => {
@@ -400,7 +417,6 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
     processResults();
   }, [pendingResults, toolCallIdToMessageIdsMap]);
 
-  // Replaced the previous logic with a more robust one that can handle multiple tool call sequences
   useEffect(() => {
     let localActiveToolCallId: string | null = null;
     const newToolCallIdToMessageIdsMap: { [key: string]: Set<string> } = {};
@@ -509,15 +525,23 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
           <button
             className="fixed top-10 right-10 hover:bg-muted p-2 rounded-xl"
             onClick={handleOpenArtifactsSidebarWithRawMap}
-            data-tooltip-content={"Open Insights viewer"}
-            data-tooltip-id="open-insights-viewer"
-          >
-            <IconDeviceAnalytics
-              stroke={1.5}
-              size={30}
-              className="text-foreground/80"
-            />
-          </button>
+          />
+          {/* becomes: */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                className="fixed top-10 right-10 hover:bg-muted p-2 rounded-xl"
+                onClick={handleOpenArtifactsSidebarWithRawMap}
+              >
+                <IconDeviceAnalytics
+                  stroke={1.5}
+                  size={30}
+                  className="text-foreground/80"
+                />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="left">Open Insights viewer</TooltipContent>
+          </Tooltip>
           {/* Messages */}
           <div className="w-full" style={{ paddingBottom: `${200}px` }}>
             {allItems.map((item) => {
@@ -575,20 +599,6 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
       >
         <ArtifactsSidebar />
       </div>
-      <Tooltip
-        id="open-insights-viewer"
-        place="left"
-        style={{
-          backgroundColor: "white",
-          color: "black",
-          position: "fixed",
-          zIndex: 10000,
-          padding: "8px",
-          borderRadius: "4px",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
-          fontWeight: "600",
-        }}
-      />
     </div>
   );
 };
