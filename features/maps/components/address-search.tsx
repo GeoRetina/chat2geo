@@ -9,7 +9,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import useZoomRequestStore from "../stores/use-map-layer-zoom-request-store";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import useZoomRequestStore from "../stores/use-map-zoom-request-store";
 import useToastMessageStore from "@/stores/use-toast-message-store";
 
 interface GeocodeResponse {
@@ -30,8 +35,8 @@ export default function AddressSearch() {
     useRef<google.maps.places.AutocompleteService | null>(null);
   const { setToastMessage } = useToastMessageStore();
 
-  const setZoomToPlaceRequest = useZoomRequestStore(
-    (state) => state.setZoomToPlaceRequest
+  const setZoomToAddressRequest = useZoomRequestStore(
+    (state) => state.setZoomToAddressRequest
   );
 
   useEffect(() => {
@@ -122,7 +127,7 @@ export default function AddressSearch() {
 
       if (response.ok && data.results && data.results[0]) {
         setError(null);
-        setZoomToPlaceRequest(data.results[0].geometry.location);
+        setZoomToAddressRequest(data.results[0].geometry.location);
         setOpen(false);
       } else {
         setError(data.error || "Failed to geocode address.");
@@ -136,15 +141,20 @@ export default function AddressSearch() {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="bg-background rounded-xl [&_svg]:size-5"
-        >
-          <Search className="text-foreground" />
-        </Button>
-      </PopoverTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <PopoverTrigger asChild>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="bg-background rounded-xl [&_svg]:size-5"
+            >
+              <Search className="text-foreground" />
+            </Button>
+          </PopoverTrigger>
+        </TooltipTrigger>
+        <TooltipContent>Search Address</TooltipContent>
+      </Tooltip>
       <PopoverContent className="w-80">
         <div className="relative">
           <Input
