@@ -10,7 +10,7 @@ import React, {
 import { RichTextarea, RichTextareaHandle } from "rich-textarea";
 import { createPortal } from "react-dom";
 import SlashMenuForMapLayers from "./slash-menu-for-map-layers";
-import { useAttachmentStore } from "@/features/chat/stores/useAttachmentsStore";
+import { useAttachmentStore } from "../../stores/use-attachments-store";
 import useROIStore from "@/features/maps/stores/use-roi-store";
 import {
   getCommandRendererSlashMenuMapLayersRenderer,
@@ -113,7 +113,7 @@ const ChatInputBox = memo<ChatInputBoxProps>(
 
     return (
       <div
-        className="flex flex-col gap-4 bg-[#f4f4f4] [box-shadow:0_-20px_20px_rgba(240,250,250,0.6),0_6px_10px_rgba(0,0,0,0.2)] dark:bg-accent dark:[box-shadow:0_-20px_20px_rgba(31,31,33,0.9),0_6px_10px_rgba(0,0,0,0.2)] h-full rounded-3xl items-center z-[1000] border border-stone-300 dark:border-stone-600"
+        className="flex flex-col gap-4 bg-gray-100 [box-shadow:0_-20px_20px_rgba(240,250,250,0.6),0_6px_10px_rgba(0,0,0,0.2)] dark:bg-accent dark:[box-shadow:0_-20px_20px_rgba(31,31,33,0.9),0_6px_10px_rgba(0,0,0,0.2)] h-full rounded-3xl items-center z-[1000] border border-stone-300 dark:border-stone-600"
         style={{
           minHeight: "160px",
         }}
@@ -125,6 +125,7 @@ const ChatInputBox = memo<ChatInputBoxProps>(
           <input {...getInputProps()} />
           <RichTextarea
             ref={textareaRef}
+            placeholder="Type a message..."
             value={inputValue}
             onChange={handleInputChange}
             autoHeight={true}
