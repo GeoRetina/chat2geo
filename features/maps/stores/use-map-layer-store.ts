@@ -5,35 +5,20 @@ import maplibregl from "maplibre-gl";
 import { checkLayerName } from "../utils/general-checks";
 import { isQueryUuid } from "@/features/chat/utils/general-utils";
 
-interface MapLayer {
-  id: string;
-  name: string;
-  visible: boolean;
-  type: "raster" | "roi";
-  layerOpacity?: number;
-  mapStats?: Record<string, any>;
-  uhiMetrics?: UHIMetrics | null;
-  layerFunctionType?: string;
-  roiName: string | null;
-}
-
 interface MapLayersState {
   mapCurrent: maplibregl.Map | null;
   setMapCurrent: (mapInstance: maplibregl.Map | null) => void;
   mapLoaded: boolean;
   setMapLoaded: (loaded: boolean) => void;
   mapLayers: MapLayer[];
-  removeLayerSignal: string | null;
   addMapLayer: (layer: MapLayer) => void;
   removeMapLayer: (id: string) => void;
-  requestRemoveMapLayer: (id: string) => void;
-  markerRemoved: boolean;
-  clearRemoveLayerSignal: () => void;
+  removeLayerSignal: string | null;
+
   getMapLayersLength: () => number;
   getMapLayer: (index: number) => MapLayer | undefined;
   toggleMapLayerVisibility: (id: string) => void;
   setLayerOpacity: (id: string, opacity: number) => void;
-  setMarkerRemoved: (removed: boolean) => void;
   getLayerPropertiesByName: (id: string) => {
     layerOpacity: number;
     layerType: string;
@@ -43,7 +28,7 @@ interface MapLayersState {
   } | null;
   getMapStats: (layerName: string) => Record<string, any> | undefined;
   reorderLayers: (newOrder: string[]) => void;
-
+  getMapLayerNames: () => string[];
   reset: () => void;
 }
 
@@ -53,7 +38,6 @@ const initialState = {
   mapLoaded: false,
   mapLayers: [] as MapLayer[],
   removeLayerSignal: null as string | null,
-  markerRemoved: false,
 };
 
 const useMapLayersStore = create<MapLayersState>((set, get) => ({
@@ -89,7 +73,7 @@ const useMapLayersStore = create<MapLayersState>((set, get) => ({
 
   removeMapLayer: (name: string) => {
     const removeGeeLayer = useGeeOutputStore.getState().removeGeeLayer;
-    const { mapCurrent, mapLayers } = get();
+    const { mapCurrent, mapLayers, removeLayerSignal } = get();
     const map = mapCurrent;
 
     if (!map) return;
@@ -128,46 +112,18 @@ const useMapLayersStore = create<MapLayersState>((set, get) => ({
     set((state) => ({
       mapLayers: state.mapLayers.filter((layer) => layer.name !== name),
       removeLayerSignal: name,
-      markerRemoved: true,
     }));
 
-    // --- Remove from GEE store if it's a raster as well ---
     if (isRoiLayer) {
       useROIStore.getState().removeRoiGeometry(name);
     } else {
       removeGeeLayer(name);
+      if (removeLayerSignal === name) {
+        setTimeout(() => {
+          set({ removeLayerSignal: name });
+        }, 1000);
+      }
     }
-  },
-
-  requestRemoveMapLayer: (name: string) => {
-    set((state) => {
-      state.removeMapLayer(name);
-      return {
-        removeLayerSignal: name,
-        markerRemoved: true,
-      };
-    });
-  },
-
-  clearRemoveLayerSignal: () => {
-    const state = get();
-    const removeGeeLayer = useGeeOutputStore.getState().removeGeeLayer;
-
-    if (state.removeLayerSignal) {
-      set(() => ({
-        mapLayers: state.mapLayers.filter(
-          (layer) => layer.name !== state.removeLayerSignal
-        ),
-        removeLayerSignal: null,
-      }));
-      removeGeeLayer(state.removeLayerSignal);
-    }
-  },
-
-  setMarkerRemoved: (removed: boolean) => {
-    set(() => ({
-      markerRemoved: removed,
-    }));
   },
 
   getMapLayersLength: () => get().mapLayers.length,
@@ -309,6 +265,8 @@ const useMapLayersStore = create<MapLayersState>((set, get) => ({
       });
     }
   },
+
+  getMapLayerNames: () => get().mapLayers.map((layer) => layer.name),
 
   // Reset method to revert all relevant state to initial defaults
   reset: () => {
