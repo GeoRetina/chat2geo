@@ -17,6 +17,7 @@ interface ChartProps {
   data: any;
   chartTitle: string;
   palette?: any;
+  chartUnit?: string;
   extraInfo?: string;
 }
 
@@ -25,6 +26,7 @@ export default function Chart({
   data,
   chartTitle,
   palette,
+  chartUnit,
   extraInfo,
 }: ChartProps) {
   const { theme } = useTheme();
@@ -36,6 +38,7 @@ export default function Chart({
   echarts.registerTheme("custom_dark", {
     labelColor: labelColor,
   });
+
   switch (chartType) {
     case "scoresBarChart":
       return <ScoresBarChart data={data} chartTitle={chartTitle} />;
@@ -46,6 +49,7 @@ export default function Chart({
           chartTitle={chartTitle}
           theme={theme}
           labelColor={labelColor}
+          chartUnit={chartUnit}
         />
       );
 
@@ -64,6 +68,7 @@ export default function Chart({
         <TimeSeriesNumericalQueryChart
           data={data}
           chartTitle={chartTitle}
+          chartUnit={chartUnit}
           theme={theme}
           labelColor={labelColor}
         />
@@ -140,6 +145,7 @@ export default function Chart({
           chartTitle={chartTitle}
           theme={theme}
           labelColor={labelColor}
+          chartUnit={chartUnit}
         />
       );
     case "dualBarChartNumerical":
@@ -292,6 +298,7 @@ export const ScoresBarChart: React.FC<ScoresBarChartProps> = ({
 interface TimeseriesChartProps {
   data: { year: number; value: number }[];
   chartTitle: string;
+  chartUnit: string | undefined;
   theme: string | undefined;
   labelColor: string;
 }
@@ -299,6 +306,7 @@ interface TimeseriesChartProps {
 export const TimeSeriesChart = ({
   data,
   chartTitle,
+  chartUnit,
   theme,
 }: TimeseriesChartProps) => {
   // Prepare the chart option using useMemo for performance optimization
@@ -349,7 +357,9 @@ export const TimeSeriesChart = ({
             const index = params[0].dataIndex;
             if (index === 1) {
               const value = params[0].value[1];
-              return `Year: ${singlePoint.year}<br/>Value: ${value}`;
+              return `Year: ${singlePoint.year}<br/>Value: ${value} ${
+                chartUnit || ""
+              }`;
             }
             return "";
           },
@@ -384,8 +394,8 @@ export const TimeSeriesChart = ({
           type: "value",
           min: singlePoint.value - 1,
           max: singlePoint.value + 1,
-          name: "",
-          nameTextStyle: { fontSize: 14 },
+          name: chartUnit || "",
+          nameTextStyle: { fontSize: 14, align: "center" },
           axisLine: {
             lineStyle: {
               // color: "#B2BEB5",
@@ -469,7 +479,7 @@ export const TimeSeriesChart = ({
           formatter: function (params: any) {
             const year = params[0].value[0];
             const value = params[0].value[1];
-            return `Year: ${year}<br/>Value: ${value}`;
+            return `Year: ${year}<br/>Value: ${value} ${chartUnit || ""}`;
           },
         },
         xAxis: {
@@ -505,7 +515,7 @@ export const TimeSeriesChart = ({
         },
         yAxis: {
           type: "value",
-          name: "",
+          name: chartUnit || "",
           min: minValue,
           max: maxValue,
           nameTextStyle: { fontSize: 14 },
@@ -536,7 +546,7 @@ export const TimeSeriesChart = ({
         },
       };
     }
-  }, [data, chartTitle]);
+  }, [data, chartTitle, chartUnit]);
 
   return (
     <div className="py-2" style={{ width: "100%", height: "100%" }}>
@@ -556,9 +566,10 @@ export const TimeSeriesChart = ({
 export const TimeSeriesNumericalQueryChart: React.FC<{
   data: any[];
   chartTitle: string;
+  chartUnit: string | undefined;
   theme: string | undefined;
   labelColor: string;
-}> = ({ data, chartTitle, theme, labelColor }) => {
+}> = ({ data, chartTitle, chartUnit, theme, labelColor }) => {
   // Find the first non-undefined field (e.g., CO, NO2)
   const dataField = Object.keys(
     data.find((d) =>
@@ -608,7 +619,9 @@ export const TimeSeriesNumericalQueryChart: React.FC<{
         const index = params[0].value[0];
         const value = params[0].value[1].toExponential(4);
         const date = validData[index].date;
-        return `Date: ${date}<br/>Value: ${value}`;
+        return `Date: ${date}<br/>Value: ${value}${
+          chartUnit ? ` ${chartUnit}` : ""
+        }`;
       },
     },
     xAxis: {
@@ -638,7 +651,7 @@ export const TimeSeriesNumericalQueryChart: React.FC<{
     },
     yAxis: {
       type: "value",
-      name: `${dataField}`,
+      name: chartUnit ? `${dataField} (${chartUnit})` : dataField,
       min: adjustedMinValue.toExponential(2),
       max: adjustedMaxValue.toExponential(2),
       axisLine: {
@@ -1173,6 +1186,7 @@ export const BarChartPercentage: React.FC<BarChartPercentageProps> = ({
 export type BarChartNumericalProps = {
   data: any;
   chartTitle: string;
+  chartUnit: string | undefined;
   theme: string | undefined;
   labelColor: string;
 };
@@ -1180,6 +1194,7 @@ export type BarChartNumericalProps = {
 export const BarChartNumerical: React.FC<BarChartNumericalProps> = ({
   data,
   chartTitle,
+  chartUnit,
   theme,
 }) => {
   const colorPalette = chartColors["barChartNumerical"];
@@ -1201,7 +1216,6 @@ export const BarChartNumerical: React.FC<BarChartNumericalProps> = ({
       left: "center",
       top: 10,
       textStyle: {
-        // color: "#e5e7eb",
         fontSize: 16,
       },
     },
@@ -1209,7 +1223,7 @@ export const BarChartNumerical: React.FC<BarChartNumericalProps> = ({
       show: false,
       trigger: "item",
       formatter: function (params: any) {
-        return `${params.name}: ${params.value}`;
+        return `${params.name}: ${params.value} ${chartUnit || ""}`;
       },
     },
     xAxis: {
@@ -1217,12 +1231,10 @@ export const BarChartNumerical: React.FC<BarChartNumericalProps> = ({
       data: data.monoTemporalQueryValues.map((_: any, index: any) => ``),
       axisLine: {
         lineStyle: {
-          // color: "#B2BEB5",
           width: 2,
         },
       },
       axisLabel: {
-        // color: "#B2BEB5",
         overflow: "break",
         rotate: 0,
         fontSize: 14,
@@ -1243,9 +1255,7 @@ export const BarChartNumerical: React.FC<BarChartNumericalProps> = ({
             show: true,
             position: "inside",
             color: theme === "dark" ? "#e5e7eb" : "#1f2937",
-            formatter: "{c}",
-            // color: "white",
-            // color: "#333333",
+            formatter: `{c} ${chartUnit || ""}`,
             fontSize: 14,
           },
         })),
@@ -1282,7 +1292,14 @@ export const BarChartNumerical: React.FC<BarChartNumericalProps> = ({
 ////////////////////////////////////////
 // Dual-bar chart for numerical values
 
-export const DualBarChartNumerical: React.FC<BarChartNumericalProps> = ({
+export type DualBarChartNumericalProps = {
+  data: any;
+  chartTitle: string;
+  theme: string | undefined;
+  labelColor: string;
+};
+
+export const DualBarChartNumerical: React.FC<DualBarChartNumericalProps> = ({
   data,
   chartTitle,
   theme,
