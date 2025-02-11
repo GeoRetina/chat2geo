@@ -6,8 +6,6 @@ import * as path from "path";
 dayjs.extend(utc);
 dayjs.extend(relativeTime);
 
-dayjs.extend(relativeTime);
-
 export function extractYear(dateString: string): number {
   const date = new Date(dateString);
   return date.getUTCFullYear();
