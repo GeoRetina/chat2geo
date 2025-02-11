@@ -2,14 +2,15 @@ import { Map, Popup } from "maplibre-gl";
 import useColorPickerStore from "@/features/maps/stores/use-color-picker-store";
 
 function getRandomBrightColor(): string {
-  let r, g, b, brightness;
+  let hue;
   do {
-    r = Math.floor(Math.random() * 256);
-    g = Math.floor(Math.random() * 256);
-    b = Math.floor(Math.random() * 256);
-    brightness = 0.299 * r + 0.587 * g + 0.114 * b;
-  } while (brightness < 130);
-  return `rgb(${r}, ${g}, ${b})`;
+    hue = Math.floor(Math.random() * 360);
+  } while (hue >= 60 && hue <= 90);
+
+  const saturation = 85 + Math.random() * 15;
+  const lightness = 45 + Math.random() * 15;
+
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
 export const addRoiLayerToMap = async (
@@ -18,7 +19,10 @@ export const addRoiLayerToMap = async (
   layerName: string
 ) => {
   const { setPickedColor } = useColorPickerStore.getState();
-  const randomColor = getRandomBrightColor();
+  let randomColor = getRandomBrightColor();
+  if (layerName === "drawnPolygon") {
+    randomColor = "yellow";
+  }
 
   // Remove existing layers/sources with the same name
   if (map.getSource(layerName)) {
