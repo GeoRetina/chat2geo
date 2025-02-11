@@ -1,9 +1,8 @@
 import React from "react";
 import { IconMap } from "@tabler/icons-react";
-// Pull in any needed store actions/selectors:
 import useMapDisplayStore from "@/features/maps/stores/use-map-display-store";
 import useLayerSelectionStore from "@/features/maps/stores/use-layer-selection-store";
-import useZoomRequestStore from "@/features/maps/stores/use-map-layer-zoom-request-store";
+import useZoomRequestStore from "@/features/maps/stores/use-map-zoom-request-store";
 import useMapLayersStore from "@/features/maps/stores/use-map-layer-store";
 
 const DisplayInChatAnalysisMapBtn = ({
@@ -27,8 +26,8 @@ const DisplayInChatAnalysisMapBtn = ({
   const setDisplayMapRequestedFromChatResponse = useMapDisplayStore(
     (state) => state.setDisplayMapRequestedFromChatResponse
   );
-  const setZoomRequestWithGeometry = useZoomRequestStore(
-    (state) => state.setZoomRequestWithGeometry
+  const setZoomToLayerRequestWithGeometry = useZoomRequestStore(
+    (state) => state.setZoomToLayerRequestWithGeometry
   );
 
   const handleClick = () => {
@@ -47,7 +46,7 @@ const DisplayInChatAnalysisMapBtn = ({
     }
 
     // Trigger your zoom / display map
-    setZoomRequestWithGeometry(analysisLayerName);
+    setZoomToLayerRequestWithGeometry(analysisLayerName);
     setDisplayMapRequestedFromChatResponse(true);
   };
 

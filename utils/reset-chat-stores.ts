@@ -15,7 +15,7 @@ import useGeojsonStore from "@/features/maps/stores/use-geojson-store";
 import useLayerSelectionStore from "@/features/maps/stores/use-layer-selection-store";
 import useMapDisplayStore from "@/features/maps/stores/use-map-display-store";
 import useMapLayersStore from "@/features/maps/stores/use-map-layer-store";
-import useZoomRequestStore from "@/features/maps/stores/use-map-layer-zoom-request-store";
+import useZoomRequestStore from "@/features/maps/stores/use-map-zoom-request-store";
 import useMapLegendStore from "@/features/maps/stores/use-map-legend-store";
 import useTableStore from "@/features/maps/stores/use-table-store";
 import { useAttachmentStore } from "@/features/chat/stores/useAttachmentsStore";

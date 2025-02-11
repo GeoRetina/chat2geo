@@ -41,7 +41,7 @@ import { cn } from "@/lib/utils";
 // ---- stores ----
 import useMapDisplayStore from "@/features/maps/stores/use-map-display-store";
 import useMapLayersStore from "@/features/maps/stores/use-map-layer-store";
-import useZoomRequestStore from "@/features/maps/stores/use-map-layer-zoom-request-store";
+import useZoomRequestStore from "@/features/maps/stores/use-map-zoom-request-store";
 import useColorPickerStore from "@/features/maps/stores/use-color-picker-store";
 import useROIStore from "@/features/maps/stores/use-roi-store";
 import useLayerSelectionStore from "@/features/maps/stores/use-layer-selection-store";

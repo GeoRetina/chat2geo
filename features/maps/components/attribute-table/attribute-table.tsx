@@ -23,9 +23,7 @@ import { Button } from "@/components/ui/button";
 
 import AttributeTableControls from "./attribute-table-controls";
 import useGeojsonStore from "../../stores/use-geojson-store";
-import useZoomRequestStore from "../../stores/use-map-layer-zoom-request-store";
-import usePlotReadyDataFromVectorLayerStore from "../../stores/plots-stores/usePlotReadyFromVectorLayerStore";
-import useLayerSelectionStore from "../../stores/use-layer-selection-store";
+import useZoomRequestStore from "../../stores/use-map-zoom-request-store";
 import useDrawnFeatureOnMapStore from "../../stores/use-drawn-feature-on-map-store";
 import useLoadingStore from "@/stores/use-loading-store";
 import useTableStore from "../../stores/use-table-store";
