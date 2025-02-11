@@ -170,24 +170,27 @@ export const checkGeometryAreaIsLessThanThreshold = (
 };
 
 export function convertToEeGeometry(geometry: any) {
-  // If geometry is FeatureCollection, combine into single ee.Geometry
   if (
     geometry.type === "FeatureCollection" &&
     Array.isArray(geometry.features)
   ) {
-    const eeFeatures = geometry.features.map((f: any) =>
-      ee.Feature(ee.Geometry(f.geometry))
-    );
-    const featureCollection = ee.FeatureCollection(eeFeatures);
-    return featureCollection.geometry();
+    if (geometry.features.length === 1) {
+      return ee.Geometry(geometry.features[0].geometry);
+    }
+
+    const multiPolygonCoordinates = geometry.features.map((feature: any) => {
+      if (!feature.geometry || !feature.geometry.coordinates) {
+        throw new Error("Invalid feature geometry provided.");
+      }
+      return feature.geometry.coordinates;
+    });
+    return ee.Geometry.MultiPolygon(multiPolygonCoordinates);
   }
 
-  // If geometry is a single Feature
   if (geometry.type === "Feature" && geometry.geometry) {
     return ee.Geometry(geometry.geometry);
   }
 
-  // Otherwise, geometry is presumably an actual geometry object
   return ee.Geometry(geometry);
 }
 
@@ -201,6 +204,13 @@ export function convertEeGeometryToGeoJSON(eeGeom: any) {
   }
   // Extend this if you handle other geometry types (Point, MultiPolygon, etc.)
   throw new Error("Unsupported geometry type or invalid EE geometry.");
+}
+
+export function convertCoordinatesToGeoJson(coordinates: {
+  lat: number;
+  lon: number;
+}) {
+  return turf.point([coordinates.lon, coordinates.lat]);
 }
 
 export function convertToNDecimals(value: number, decimals: number): number {
