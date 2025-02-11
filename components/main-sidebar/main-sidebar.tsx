@@ -7,7 +7,6 @@ import useSidebarButtonStores, {
 import {
   IconEdit,
   IconBook,
-  IconDeviceDesktopCog,
   IconDatabaseImport,
   IconCirclesRelation,
   IconCircleChevronLeft,
@@ -46,12 +45,14 @@ const MainSidebar = () => {
     router.push(`/${page}`);
   }
 
+  // Helper to build class names conditionally
   function getButtonClasses(page: Pages, extraClasses?: string) {
     const base =
       `flex items-center gap-4 px-3 py-2 rounded-xl w-full cursor-pointer ${
         isSidebarCollapsed ? "justify-center" : "justify-start"
       } ${extraClasses || ""}`.trim();
 
+    // If this button is for the active page, use "active" styles only:
     if (pageToOpen === page && page !== Pages.NewChat) {
       return `${base} bg-stone-300 text-gray-800`;
     }
@@ -91,7 +92,6 @@ const MainSidebar = () => {
               <span className="whitespace-nowrap">Session History</span>
             )}
           </button>
-
           <button
             className={getButtonClasses(Pages.KnowledgeBase)}
             data-tooltip-content="Manage knowledge base documents"
@@ -109,7 +109,7 @@ const MainSidebar = () => {
 
           <button
             className={getButtonClasses(Pages.Integrations)}
-            data-tooltip-content="Manage database and environment integrations"
+            data-tooltip-content="Manage integrations"
             data-tooltip-id="integrations"
             onClick={() => handleOpenPage(Pages.Integrations)}
           >
@@ -125,8 +125,9 @@ const MainSidebar = () => {
           {/* Feedback Button (placed inside nav, using same style) */}
           <button
             onClick={() => setIsFeedbackOpen(true)}
-            // Note: We pass no 'page' or a dummy (Pages.NewChat, or create your own if you want active style)
             className={getButtonClasses(Pages.NewChat, "mb-3 translate-y-10")}
+            data-tooltip-content="Send feedback"
+            data-tooltip-id="feedback"
           >
             <IconMessage stroke={1.5} className="h-7 w-7 flex-shrink-0" />
             {!isSidebarCollapsed && <span>Feedback</span>}
@@ -175,11 +176,11 @@ const MainSidebar = () => {
             backgroundColor: "white",
             color: "black",
             position: "fixed",
-            zIndex: 10000,
+            zIndex: 9999,
             padding: "8px",
             borderRadius: "4px",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
-            fontWeight: "600",
+            fontWeight: "500",
           }}
           hidden={!isSidebarCollapsed}
         />
@@ -190,11 +191,26 @@ const MainSidebar = () => {
             backgroundColor: "white",
             color: "black",
             position: "fixed",
-            zIndex: 10000,
+            zIndex: 9999,
             padding: "8px",
             borderRadius: "4px",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
-            fontWeight: "600",
+            fontWeight: "500",
+          }}
+          hidden={!isSidebarCollapsed}
+        />
+        <Tooltip
+          id="build-center"
+          place="right"
+          style={{
+            backgroundColor: "white",
+            color: "black",
+            position: "fixed",
+            zIndex: 9999,
+            padding: "8px",
+            borderRadius: "4px",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
+            fontWeight: "500",
           }}
           hidden={!isSidebarCollapsed}
         />
@@ -205,11 +221,11 @@ const MainSidebar = () => {
             backgroundColor: "white",
             color: "black",
             position: "fixed",
-            zIndex: 10000,
+            zIndex: 9999,
             padding: "8px",
             borderRadius: "4px",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
-            fontWeight: "600",
+            fontWeight: "500",
           }}
           hidden={!isSidebarCollapsed}
         />
@@ -220,41 +236,26 @@ const MainSidebar = () => {
             backgroundColor: "white",
             color: "black",
             position: "fixed",
-            zIndex: 10000,
+            zIndex: 9999,
             padding: "8px",
             borderRadius: "4px",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
-            fontWeight: "600",
+            fontWeight: "500",
           }}
           hidden={!isSidebarCollapsed}
         />
         <Tooltip
-          id="profile"
+          id="feedback"
           place="right"
           style={{
             backgroundColor: "white",
             color: "black",
             position: "fixed",
-            zIndex: 10000,
+            zIndex: 9999,
             padding: "8px",
             borderRadius: "4px",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
-            fontWeight: "600",
-          }}
-          hidden={!isSidebarCollapsed}
-        />
-        <Tooltip
-          id="settings"
-          place="right"
-          style={{
-            backgroundColor: "white",
-            color: "black",
-            position: "fixed",
-            zIndex: 10000,
-            padding: "8px",
-            borderRadius: "4px",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
-            fontWeight: "600",
+            fontWeight: "500",
           }}
           hidden={!isSidebarCollapsed}
         />
@@ -265,11 +266,11 @@ const MainSidebar = () => {
             backgroundColor: "white",
             color: "black",
             position: "fixed",
-            zIndex: 10000,
+            zIndex: 9999,
             padding: "8px",
             borderRadius: "4px",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
-            fontWeight: "600",
+            fontWeight: "500",
           }}
           hidden={!isSidebarCollapsed}
         />
