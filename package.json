@@ -1,6 +1,6 @@
 {
   "name": "chat2geo",
-  "version": "0.5.16-alpha",
+  "version": "0.6.0-alpha",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
