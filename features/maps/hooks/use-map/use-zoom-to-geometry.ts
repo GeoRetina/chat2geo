@@ -3,21 +3,32 @@
 import { useEffect } from "react";
 import { Map } from "maplibre-gl";
 import useMapLayersStore from "../../stores/use-map-layer-store";
-import useZoomRequestStore from "../../stores/use-map-layer-zoom-request-store";
+import useZoomRequestStore, {
+  AddressSearchProps,
+} from "../../stores/use-map-zoom-request-store";
 import {
   calculateGeometryCentroid,
   calculateZoomLevel,
+  convertCoordinatesToGeoJson,
   convertFeatureToGeometry,
 } from "@/features/maps/utils/geometry-utils";
+import { addGeocodedPointToMap } from "../../utils/add-geocoded-point-to-map";
 
 export default function useZoomToGeometry(mapInstance: Map | null) {
   const mapLoaded = useMapLayersStore((state) => state.mapLoaded);
 
-  const zoomRequestGeometry = useZoomRequestStore(
-    (state) => state.zoomRequestWithGeometry
+  const zoomToLayerRequestWithGeometry = useZoomRequestStore(
+    (state) => state.zoomToLayerRequestWithGeometry
   );
-  const setZoomRequestWithGeometry = useZoomRequestStore(
-    (state) => state.setZoomRequestWithGeometry
+  const setZoomToLayerRequestWithGeometry = useZoomRequestStore(
+    (state) => state.setZoomToLayerRequestWithGeometry
+  );
+
+  const zoomToAddressRequest = useZoomRequestStore(
+    (state) => state.zoomToAddressRequest
+  );
+  const setZoomToAddressRequest = useZoomRequestStore(
+    (state) => state.setZoomToAddressRequest
   );
 
   const zoomRequestFromTable = useZoomRequestStore(
@@ -31,18 +42,25 @@ export default function useZoomToGeometry(mapInstance: Map | null) {
     if (
       !mapInstance ||
       !mapLoaded ||
-      (!zoomRequestFromTable && !zoomRequestGeometry)
+      (!zoomRequestFromTable &&
+        !zoomToLayerRequestWithGeometry &&
+        !zoomToAddressRequest)
     )
       return;
 
-    let targetPoint: [number, number] = [-75.7003, 45.4201];
+    let targetPoint: [number, number] | AddressSearchProps = [
+      -75.7003, 45.4201,
+    ];
     let targetZoom = 12;
     let isHandled = false;
 
-    if (zoomRequestGeometry?.geometry) {
-      // Handle zoomRequestGeometry
-      targetPoint = calculateGeometryCentroid(zoomRequestGeometry.geometry);
-      targetZoom = calculateZoomLevel(zoomRequestGeometry.geometry);
+    if (zoomToLayerRequestWithGeometry?.geometry) {
+      // Handle zoomToLayerRequestWithGeometry
+      targetPoint = calculateGeometryCentroid(
+        zoomToLayerRequestWithGeometry.geometry
+      );
+
+      targetZoom = calculateZoomLevel(zoomToLayerRequestWithGeometry.geometry);
 
       isHandled = true;
     } else if (zoomRequestFromTable?.geometry) {
@@ -51,23 +69,38 @@ export default function useZoomToGeometry(mapInstance: Map | null) {
       targetPoint = calculateGeometryCentroid(geometry);
       targetZoom = calculateZoomLevel(geometry);
       isHandled = true;
+    } else if (zoomToAddressRequest) {
+      // Handle zoomToAddressRequest
+      targetPoint = zoomToAddressRequest;
+      targetZoom = 16;
+      isHandled = true;
+      const geocodedPoint = convertCoordinatesToGeoJson({
+        lat: zoomToAddressRequest.lat,
+        lon: zoomToAddressRequest.lng,
+      });
+      addGeocodedPointToMap(mapInstance, geocodedPoint, "geocoded-point");
     }
 
     if (isHandled) {
-      mapInstance.flyTo({
+      mapInstance.jumpTo({
         center: targetPoint,
         zoom: targetZoom,
-        essential: true,
-        maxDuration: 1000,
       });
 
       // Delay clearing the state until after the animation completes
       const timeout = setTimeout(() => {
-        if (zoomRequestGeometry?.geometry) setZoomRequestWithGeometry(null);
+        if (zoomToLayerRequestWithGeometry?.geometry)
+          setZoomToLayerRequestWithGeometry(null);
         if (zoomRequestFromTable?.geometry) setZoomRequestFromTable(null);
+        if (zoomToAddressRequest) setZoomToAddressRequest(null);
       }, 1100);
 
       return () => clearTimeout(timeout);
     }
-  }, [mapLoaded, zoomRequestGeometry, zoomRequestFromTable]);
+  }, [
+    mapLoaded,
+    zoomToLayerRequestWithGeometry,
+    zoomToAddressRequest,
+    zoomRequestFromTable,
+  ]);
 }
