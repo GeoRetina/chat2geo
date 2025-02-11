@@ -93,8 +93,6 @@ export default function useQueryDrawing({
         const intersectionOK = checkGeometryIntersection(
           geometry,
           useSelectedRoi
-            ? useSelectedRoi
-            : projectConfigs.defaultBoundaryCoordsKingston
         );
         if (!intersectionOK) {
           setToastMessage("Selected area is outside the boundary.", "error");
@@ -219,7 +217,7 @@ export default function useQueryDrawing({
         // 1) Validate geometry intersection with ROI or default boundary
         const intersectionOK = checkGeometryIntersection(
           geojsonCoords,
-          useSelectedRoi || projectConfigs.defaultBoundaryCoordsKingston
+          useSelectedRoi
         );
         if (!intersectionOK) {
           setToastMessage("Selected area is outside the boundary.", "error");
