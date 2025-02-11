@@ -48,7 +48,7 @@ export const initializeMap = (containerId: string): maplibregl.Map => {
     },
 
     center: [-76.493, 44.2334],
-    zoom: 10,
+    zoom: 2,
     pitch: 0,
     bearing: 0,
     antialias: true,
