@@ -22,7 +22,7 @@ export const changelog: ChangelogEntry[] = [
   #### Bug Fixes
   - Fixed some minor UI issues.
   - Fixed issue with the analysis layers not being centered on the map.
-  - 
+  
       `.trim(),
   },
 ];
