@@ -63,9 +63,9 @@ export default async function googleDynamicWorldMapping(
     .reduceRegion({
       reducer: ee.Reducer.frequencyHistogram(),
       geometry,
-      scale: 10,
+      scale: 30,
       tileScale: 16,
-      maxPixels: 1e13,
+      maxPixels: 1e100,
       bestEffort: true,
     })
     .get("label");
@@ -83,6 +83,7 @@ export default async function googleDynamicWorldMapping(
       0
     );
 
+    // Convert raw counts to percentages
     mapStats = Object.fromEntries(
       Object.entries(histogram).map(([key, value]) => {
         const labelIndex = parseInt(key, 10);
