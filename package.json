@@ -16,6 +16,7 @@
     "@blocknote/mantine": "^0.21.0",
     "@blocknote/react": "^0.21.0",
     "@google/earthengine": "^1.4.0",
+    "@googlemaps/google-maps-services-js": "^3.4.0",
     "@hello-pangea/dnd": "^17.0.0",
     "@hookform/resolvers": "^3.9.1",
     "@langchain/community": "^0.3.19",
