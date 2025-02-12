@@ -21,10 +21,10 @@ https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
 
 ## Table of Contents
 
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Current Analyses](#current-analyses)
+- [Features](#features-)
+- [Tech Stack](#tech-stack-)
+- [Getting Started](#getting-started-)
+- [Current Analyses](#available-geospatial-analyses-)
 - [Considerations](#considerations)
 
 ---
@@ -127,6 +127,8 @@ https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
 
 Visit http://localhost:3000 to view the application.
 
+
+<a name="custom_anchor_name"></a>
 ## How to Set up Supabase Database, Storage Bucket, & Authentication 🛢️
 
 Supabase has a free-tier, generous plan that you can use to work with the app.
@@ -140,11 +142,16 @@ If you want to also use the Knowledge Base feature, you need to create a storage
 
 ## Available Geospatial Analyses 📊
 
-Three sample analyses are included in this app: 
-   1. urban heat island (UHI) analysis
-   2. land-use/land-cover mapping (using Google DynamicWorld)
-   3. land-use/land-cover change mapping (using Google DynamicWorld)
-   4. air pollution analysis (not completely implemented yet)
+The app includes the following geospatial analyses:
+
+| #  | Analysis Type                                    | Description |
+|----|------------------------------------------------|-------------|
+| 1  | **Urban Heat Island (UHI) Analysis**           | Evaluates temperature variations in urban areas compared to rural surroundings. |
+| 2  | **Land-Use/Land-Cover Mapping**                | Uses Google DynamicWorld to classify land cover types. |
+| 3  | **Land-Use/Land-Cover Change Mapping**         | Detects changes in land use over time using Google DynamicWorld. |
+| 4  | **Air Pollution Analysis** *(Not fully implemented)* | Analyzes air pollution patterns and trends. |
+
+
 
 
 ## Considerations💡
@@ -155,66 +162,72 @@ Three sample analyses are included in this app:
 - There are parts that should be refactored or re-designed either because they could have been used/invoked in a better place, or because they should've been implemented in a much better manner.
 
 
-## Frequently Asked Questions (FAQ) 📌 
+## Frequently Asked Questions (FAQ) 📌
 
-### 🔹 General Questions
+<details>
+  <summary>🔹 General Questions</summary>
+  
+  **❓ Is this project free to use?**  
+  *Yes! This open-source version is free to use under the terms of its license. However, note that Google Earth Engine has restrictions on commercial usage.*
+  
+</details>
 
- #### ❓ Is this project free to use?
- *Yes! This open-source version is free to use under the terms of its license. However, note that Google Earth Engine has restrictions on commercial usage.*
+<details>
+  <summary>🔹 Support &amp; Contributions</summary>
+  
+  **❓ How can I get support for issues?**  
+  - *If you encounter a bug or have a feature request, please [open an issue](../../issues) on GitHub.*  
+  - *Be as detailed as possible when describing your issue (include screenshots, step-by-step explanations, error logs, and any relevant details). Abstract or vague questions will not be answered.*  
+  - *For other questions, feel free to reach out at [shahabj.github@gmail.com](mailto:shahabj.github@gmail.com).*
+  
+  **❓ How can I contribute?**  
+  *We welcome contributions! Please check out the [Contributing Guidelines](./CONTRIBUTING.md) before submitting a pull request or opening an issue. Your help in improving this project is greatly appreciated.*
+  
+</details>
 
----
+<details>
+  <summary>🔹 Features &amp; Customization</summary>
+  
+  **❓ Can I request additional analyses or features?**  
+  *Absolutely! You can:*
+  - *Suggest a feature by opening an issue.*
+  - *Fork the repository and implement your own changes.*  
+  *For advanced or custom solutions, please see [GRAI 2.0 (Enterprise Version)](#enterprise-version-grai-20) below.*
+  
+  **❓ Can I use my own geospatial datasets?**  
+  *Yes! The app allows you to import vector data and integrate it with Google Earth Engine for custom analyses. For raster data, at least for now, you need to either host them on GEE or a GCP bucket.*
+  
+</details>
 
-### 🔹 Support & Contributions
+<details>
+  <summary>🔹 Enterprise Version: GRAI 2.0</summary>
+  
+  **❓ What is GRAI 2.0?**  
+  *GRAI 2.0 is the enterprise version of this project, offering:*
+  - *Custom-built solutions tailored to specific client needs.*
+  - *Additional analyses &amp; AI models not included in the open-source version.*
+  - *Continuous updates &amp; premium support.*
+  
+  **❓ How do I get access to GRAI 2.0?**  
+  *For enterprise inquiries, please visit the [GeoRetina Contact Page](https://www.georetina.com/contact).*
+  
+</details>
 
-#### ❓ How can I get support for issues?
-- *If you encounter a bug or have a feature request, please* **[open an issue](../../issues)** *on GitHub.*
-- *Please be as detailed as possible when describing your issue. When asking for help, include screenshots, step-by-step explanations, error logs, and any relevant details.* ***Abstract or vague questions will not be answered.***
-- *For other questions, feel free to reach out at* **[shahabj.github@gmail.com](mailto:shahabj.github@gmail.com)**.
+<details>
+  <summary>🔹 Technical &amp; Setup Questions</summary>
+  
+  **❓ I'm facing issues with setup. What should I do?**  
+  1. *Check that your environment variables are properly set in `.env.local`.*
+  2. *To get past the login page, you need to first set up a Supabase Auth as described in [Supabase Setup](#how-to-set-up-supabase-database-storage-bucket--authentication-%EF%B8%8F).*
+  3. *Check your database configurations.*
+  4. *Confirm your Google Earth Engine configuration.*
+  5. *Refer to the [Getting Started](#getting-started) section in this README.*
+  6. *If issues persist, [open an issue](../../issues).*
+  
+</details>
 
-#### ❓ How can I contribute?
-*We welcome contributions! Please check out the* **[Contributing Guidelines](./CONTRIBUTING.md)** *before submitting a pull request or opening an issue. Your help in improving this project is greatly appreciated.*
+*Have a question not listed here? Feel free to [open an issue](../../issues) or reach out via email!* 🚀
 
----
-
-### 🔹 Features & Customization
-
- #### ❓ Can I request additional analyses or features?
-   *Absolutely! You can:*
-   - *Suggest a feature by opening an issue.*
-   - *Fork the repository and implement your own changes.*
-
- *For advanced or custom solutions, please see* **[GRAI 2.0 (Enterprise Version)](#enterprise-version-grai-20)** *below.*
-
- #### ❓ Can I use my own geospatial datasets?
- *Yes! The app allows you to import vector data and integrate it with Google Earth Engine for custom analyses. For raster data, at least for now, you need to either host them on GEE or a GCP bucket.*
-
----
-
-### 🔹 Enterprise Version: GRAI 2.0
-
-#### ❓ What is GRAI 2.0?
-*GRAI 2.0 is the enterprise version of this project, offering:*
-- *Custom-built solutions tailored to specific client needs.*
-- *Additional analyses & AI models not included in the open-source version.*
-- *Continuous updates & premium support.*
-
-#### ❓ How do I get access to GRAI 2.0?
-*For enterprise inquiries, please visit* **[GeoRetina Contact Page](https://www.georetina.com/contact)**.
-
----
-
-### 🔹 Technical & Setup Questions
-
-#### ❓ I'm facing issues with setup. What should I do?
-1. *Check that your environment variables are properly set in* `.env.local`.
-2. *Check your database configurations.*
-3. *Confirm your Google Earth Engine configuration.*
-4. *Refer to the* **[Getting Started](#getting-started)** *section in this README.*
-5. *If issues persist,* **[open an issue](../../issues)**.
-
----
-
-*Have a question not listed here? Feel free to* **[open an issue](../../issues)** *or reach out via email!* 🚀
 
 
 
