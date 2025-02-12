@@ -6,7 +6,7 @@ Chat2Geo also has advanced knowledge retrieval based on Retrieval-augmented gene
 
 The app also has authentication and database integrations, making it almost a complete package. 
 
-Chat2Geo inherits a large portion of its building blocks from the GRAI 2.0 app that is under development at GeoRetina (www.georetina.com). In parallel with GRAI 2.0 (which I plan to open-source once it's stable), I will also keep Chat2Geo updated for the community.
+Chat2Geo inherits a large portion of its building blocks from the GRAI 2.0 app that is under development at GeoRetina (www.georetina.com). In parallel with GRAI 2.0 (which will be merged to Chat2Geo once it's stable), we will also keep Chat2Geo updated for the community.
 
 
 https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
@@ -15,7 +15,7 @@ https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
 
 ## Contributing 🛠️
 
- - If you're interested in contributing to this project, please contact me at `shahabj.github@gmail.com`.
+ - If you're interested in contributing to this project, please contact us at `shahabj.github@gmail.com`.
  - If you are a new contributor, please first check out our [Contributing Guidelines](./CONTRIBUTING.md) to get started.
 
 
