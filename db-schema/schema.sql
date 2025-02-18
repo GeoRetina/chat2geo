@@ -289,11 +289,6 @@ ALTER TABLE ONLY "public"."messages"
 
 
 
-ALTER TABLE ONLY "public"."user_projects"
-    ADD CONSTRAINT "user_projects_pkey" PRIMARY KEY ("id");
-
-
-
 ALTER TABLE ONLY "public"."user_roles"
     ADD CONSTRAINT "user_roles_email_key" UNIQUE ("email");
 
@@ -337,11 +332,6 @@ ALTER TABLE ONLY "public"."messages"
 
 
 
-ALTER TABLE ONLY "public"."user_projects"
-    ADD CONSTRAINT "user_projects_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user_roles"("id") ON DELETE CASCADE;
-
-
-
 ALTER TABLE ONLY "public"."user_roles"
     ADD CONSTRAINT "user_roles_id_fkey" FOREIGN KEY ("id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
@@ -349,25 +339,6 @@ ALTER TABLE ONLY "public"."user_roles"
 
 ALTER TABLE ONLY "public"."user_usage"
     ADD CONSTRAINT "user_usage_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user_roles"("id") ON DELETE CASCADE;
-
-
-
-CREATE POLICY "ALLOW DELETE for user_projects table" ON "public"."user_projects" FOR DELETE TO "authenticated" USING ((EXISTS ( SELECT 1
-   FROM "public"."user_roles"
-  WHERE (("user_roles"."id" = "user_projects"."user_id") AND (("user_roles"."email")::"text" = "auth"."email"())))));
-
-
-
-CREATE POLICY "ALLOW INSERT user_projects table" ON "public"."user_projects" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
-   FROM "public"."user_roles"
-  WHERE (("user_roles"."id" = "user_projects"."user_id") AND (("user_roles"."email")::"text" = "auth"."email"())))));
-
-
-
-CREATE POLICY "ALLOW SELECT for user_projects table" ON "public"."user_projects" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
-   FROM "public"."user_roles"
-  WHERE (("user_roles"."id" = "user_projects"."user_id") AND (("user_roles"."email")::"text" = "auth"."email"())))));
-
 
 
 CREATE POLICY "AUTHENTICATED" ON "public"."chats" TO "authenticated" USING (("userId" = "auth"."uid"())) WITH CHECK (("userId" = "auth"."uid"()));
@@ -501,12 +472,6 @@ GRANT ALL ON SEQUENCE "public"."embeddings_id_seq" TO "service_role";
 GRANT ALL ON TABLE "public"."messages" TO "anon";
 GRANT ALL ON TABLE "public"."messages" TO "authenticated";
 GRANT ALL ON TABLE "public"."messages" TO "service_role";
-
-
-GRANT ALL ON TABLE "public"."user_projects" TO "anon";
-GRANT ALL ON TABLE "public"."user_projects" TO "authenticated";
-GRANT ALL ON TABLE "public"."user_projects" TO "service_role";
-
 
 
 GRANT ALL ON TABLE "public"."user_roles" TO "anon";
