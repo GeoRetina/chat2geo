@@ -89,6 +89,10 @@ https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
 
 - Create a `.env.local` file (or similar) with the required credentials for:
 
+  - Your base url:
+     ```
+     BASE_URL=http://localhost:3000   # Change it if you're using a different port. In production, you should set it to the url of the deployment. 
+     ```
   - Google Cloud Platform (GCP):
     ```
       GOOGLE_MAPS_API_KEY=           # API key for Google maps. You can replace Google Maps with OSM if you want.
