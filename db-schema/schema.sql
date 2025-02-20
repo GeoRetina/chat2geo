@@ -11,10 +11,10 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA public;
-
 
 CREATE SCHEMA IF NOT EXISTS "public";
+
+CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA public;
 
 
 ALTER SCHEMA "public" OWNER TO "pg_database_owner";
@@ -59,6 +59,38 @@ $$;
 
 
 ALTER FUNCTION "public"."create_user_usage_row"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."handle_new_auth_user"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$
+BEGIN
+  INSERT INTO public.user_roles (
+    id,
+    name,
+    email,
+    organization,
+    role,
+    license_start,
+    license_end,
+    subscription_tier
+  )
+  VALUES (
+    NEW.id,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', 'New User'),
+    NEW.email,
+    '',
+    'TRIAL',
+    CURRENT_DATE,
+    CURRENT_DATE + 14,
+    'Essentials'
+  );
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."handle_new_auth_user"() OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."search_documents_by_similarity"("query_embedding" "public"."vector", "match_count" integer DEFAULT NULL::integer, "filter" "jsonb" DEFAULT '{}'::"jsonb") RETURNS TABLE("id" bigint, "content" "text", "metadata" "jsonb")
@@ -115,6 +147,30 @@ $$;
 
 
 ALTER FUNCTION "public"."search_documents_by_similarity"("query_embedding" "public"."vector", "match_count" integer, "owner_uuid" "uuid", "metadata_filter" "jsonb") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."search_gee_datasets_ft"("query" "text") RETURNS TABLE("id" integer, "dataset_id" "text", "asset_url" "text", "type" "text", "start_date" "date", "end_date" "date", "title" "text", "rank" real)
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    gd.id,
+    gd.dataset_id,
+    gd.asset_url,
+    gd.type,
+    gd.start_date,
+    gd.end_date,
+    gd.title,
+    ts_rank(gd.search_vector, to_tsquery('simple', query)) AS rank
+  FROM public.gee_datasets gd
+  WHERE gd.search_vector @@ to_tsquery('simple', query)
+  ORDER BY rank DESC;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."search_gee_datasets_ft"("query" "text") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."update_user_usage_docs_count"() RETURNS "trigger"
@@ -184,6 +240,18 @@ ALTER TABLE "public"."document_files" ALTER COLUMN "id" ADD GENERATED ALWAYS AS 
 
 
 
+CREATE TABLE IF NOT EXISTS "public"."drafted_reports" (
+    "id" "uuid" DEFAULT "extensions"."uuid_generate_v4"() NOT NULL,
+    "userId" "uuid",
+    "title" character varying(255) NOT NULL,
+    "content" "text",
+    "createdAt" timestamp without time zone DEFAULT "now"()
+);
+
+
+ALTER TABLE "public"."drafted_reports" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "public"."embeddings" (
     "id" bigint NOT NULL,
     "content" "text",
@@ -211,6 +279,40 @@ ALTER SEQUENCE "public"."embeddings_id_seq" OWNED BY "public"."embeddings"."id";
 
 
 
+CREATE TABLE IF NOT EXISTS "public"."gee_datasets" (
+    "id" integer NOT NULL,
+    "dataset_id" "text",
+    "asset_url" "text",
+    "provider" "text",
+    "title" "text",
+    "start_date" "date",
+    "end_date" "date",
+    "tags" "text",
+    "type" "text",
+    "thumbnail_url" "text",
+    "search_vector" "tsvector"
+);
+
+
+ALTER TABLE "public"."gee_datasets" OWNER TO "postgres";
+
+
+CREATE SEQUENCE IF NOT EXISTS "public"."gee_datasets_id_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE "public"."gee_datasets_id_seq" OWNER TO "postgres";
+
+
+ALTER SEQUENCE "public"."gee_datasets_id_seq" OWNED BY "public"."gee_datasets"."id";
+
+
+
 CREATE TABLE IF NOT EXISTS "public"."messages" (
     "id" "uuid" DEFAULT "extensions"."uuid_generate_v4"() NOT NULL,
     "chatId" "uuid",
@@ -223,7 +325,6 @@ CREATE TABLE IF NOT EXISTS "public"."messages" (
 
 
 ALTER TABLE "public"."messages" OWNER TO "postgres";
-
 
 
 CREATE TABLE IF NOT EXISTS "public"."user_roles" (
@@ -258,6 +359,10 @@ ALTER TABLE ONLY "public"."embeddings" ALTER COLUMN "id" SET DEFAULT "nextval"('
 
 
 
+ALTER TABLE ONLY "public"."gee_datasets" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."gee_datasets_id_seq"'::"regclass");
+
+
+
 ALTER TABLE ONLY "public"."chats"
     ADD CONSTRAINT "chats_pkey" PRIMARY KEY ("id");
 
@@ -278,15 +383,23 @@ ALTER TABLE ONLY "public"."document_files"
 
 
 
+ALTER TABLE ONLY "public"."drafted_reports"
+    ADD CONSTRAINT "drafted_reports_pkey" PRIMARY KEY ("id");
+
+
 
 ALTER TABLE ONLY "public"."embeddings"
     ADD CONSTRAINT "embeddings_pkey" PRIMARY KEY ("id");
 
 
 
+ALTER TABLE ONLY "public"."gee_datasets"
+    ADD CONSTRAINT "gee_datasets_pkey" PRIMARY KEY ("id");
+
+
+
 ALTER TABLE ONLY "public"."messages"
     ADD CONSTRAINT "messages_pkey" PRIMARY KEY ("id");
-
 
 
 
@@ -302,6 +415,18 @@ ALTER TABLE ONLY "public"."user_roles"
 
 ALTER TABLE ONLY "public"."user_usage"
     ADD CONSTRAINT "user_usage_pkey" PRIMARY KEY ("id");
+
+
+
+CREATE INDEX "gee_datasets_dataset_id_idx" ON "public"."gee_datasets" USING "btree" ("lower"("dataset_id"));
+
+
+
+CREATE INDEX "gee_datasets_search_idx" ON "public"."gee_datasets" USING "gin" ("search_vector");
+
+
+
+CREATE INDEX "gee_datasets_title_idx" ON "public"."gee_datasets" USING "btree" ("lower"("title"));
 
 
 
@@ -323,6 +448,11 @@ ALTER TABLE ONLY "public"."document_files"
 
 
 
+ALTER TABLE ONLY "public"."drafted_reports"
+    ADD CONSTRAINT "drafted_reports_user_id_fkey" FOREIGN KEY ("userId") REFERENCES "public"."user_roles"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."embeddings"
     ADD CONSTRAINT "embeddings_file_id_fkey" FOREIGN KEY ("file_id") REFERENCES "public"."document_files"("id") ON DELETE CASCADE;
 
@@ -333,6 +463,11 @@ ALTER TABLE ONLY "public"."messages"
 
 
 
+ALTER TABLE ONLY "public"."messages"
+    ADD CONSTRAINT "messages_drafted_report_id_fkey" FOREIGN KEY ("draftedReportId") REFERENCES "public"."drafted_reports"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."user_roles"
     ADD CONSTRAINT "user_roles_id_fkey" FOREIGN KEY ("id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
@@ -340,6 +475,7 @@ ALTER TABLE ONLY "public"."user_roles"
 
 ALTER TABLE ONLY "public"."user_usage"
     ADD CONSTRAINT "user_usage_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user_roles"("id") ON DELETE CASCADE;
+
 
 
 CREATE POLICY "AUTHENTICATED" ON "public"."chats" TO "authenticated" USING (("userId" = "auth"."uid"())) WITH CHECK (("userId" = "auth"."uid"()));
@@ -378,7 +514,15 @@ CREATE POLICY "Allow authenticated users to access their own roles" ON "public".
 
 
 
+CREATE POLICY "INSERT" ON "public"."user_roles" FOR INSERT TO "service_role", "postgres" WITH CHECK (true);
+
+
+
 CREATE POLICY "INSERT" ON "public"."user_usage" FOR INSERT TO "authenticated" WITH CHECK (("user_id" = "auth"."uid"()));
+
+
+
+CREATE POLICY "SELECT" ON "public"."gee_datasets" FOR SELECT TO "authenticated" USING (true);
 
 
 
@@ -396,8 +540,13 @@ ALTER TABLE "public"."chats" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."document_files" ENABLE ROW LEVEL SECURITY;
 
 
+ALTER TABLE "public"."drafted_reports" ENABLE ROW LEVEL SECURITY;
+
 
 ALTER TABLE "public"."embeddings" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."gee_datasets" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."messages" ENABLE ROW LEVEL SECURITY;
@@ -422,6 +571,12 @@ GRANT ALL ON FUNCTION "public"."create_user_usage_row"() TO "service_role";
 
 
 
+GRANT ALL ON FUNCTION "public"."handle_new_auth_user"() TO "anon";
+GRANT ALL ON FUNCTION "public"."handle_new_auth_user"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."handle_new_auth_user"() TO "service_role";
+
+
+
 GRANT ALL ON FUNCTION "public"."search_documents_by_similarity"("query_embedding" "public"."vector", "match_count" integer, "filter" "jsonb") TO "anon";
 GRANT ALL ON FUNCTION "public"."search_documents_by_similarity"("query_embedding" "public"."vector", "match_count" integer, "filter" "jsonb") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."search_documents_by_similarity"("query_embedding" "public"."vector", "match_count" integer, "filter" "jsonb") TO "service_role";
@@ -431,6 +586,12 @@ GRANT ALL ON FUNCTION "public"."search_documents_by_similarity"("query_embedding
 GRANT ALL ON FUNCTION "public"."search_documents_by_similarity"("query_embedding" "public"."vector", "match_count" integer, "owner_uuid" "uuid", "metadata_filter" "jsonb") TO "anon";
 GRANT ALL ON FUNCTION "public"."search_documents_by_similarity"("query_embedding" "public"."vector", "match_count" integer, "owner_uuid" "uuid", "metadata_filter" "jsonb") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."search_documents_by_similarity"("query_embedding" "public"."vector", "match_count" integer, "owner_uuid" "uuid", "metadata_filter" "jsonb") TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."search_gee_datasets_ft"("query" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."search_gee_datasets_ft"("query" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."search_gee_datasets_ft"("query" "text") TO "service_role";
 
 
 
@@ -458,6 +619,12 @@ GRANT ALL ON SEQUENCE "public"."document_files_id_seq" TO "service_role";
 
 
 
+GRANT ALL ON TABLE "public"."drafted_reports" TO "anon";
+GRANT ALL ON TABLE "public"."drafted_reports" TO "authenticated";
+GRANT ALL ON TABLE "public"."drafted_reports" TO "service_role";
+
+
+
 GRANT ALL ON TABLE "public"."embeddings" TO "anon";
 GRANT ALL ON TABLE "public"."embeddings" TO "authenticated";
 GRANT ALL ON TABLE "public"."embeddings" TO "service_role";
@@ -470,9 +637,22 @@ GRANT ALL ON SEQUENCE "public"."embeddings_id_seq" TO "service_role";
 
 
 
+GRANT ALL ON TABLE "public"."gee_datasets" TO "anon";
+GRANT ALL ON TABLE "public"."gee_datasets" TO "authenticated";
+GRANT ALL ON TABLE "public"."gee_datasets" TO "service_role";
+
+
+
+GRANT ALL ON SEQUENCE "public"."gee_datasets_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."gee_datasets_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."gee_datasets_id_seq" TO "service_role";
+
+
+
 GRANT ALL ON TABLE "public"."messages" TO "anon";
 GRANT ALL ON TABLE "public"."messages" TO "authenticated";
 GRANT ALL ON TABLE "public"."messages" TO "service_role";
+
 
 
 GRANT ALL ON TABLE "public"."user_roles" TO "anon";
