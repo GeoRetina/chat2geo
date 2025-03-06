@@ -8,6 +8,10 @@ The app also has authentication and database integrations, making it almost a co
 
 Chat2Geo inherits a large portion of its building blocks from the GRAI 2.0 app that is under development at GeoRetina (www.georetina.com). In parallel with GRAI 2.0 (which will be merged to Chat2Geo once it's stable), we will also keep Chat2Geo updated for the community.
 
+### 🌍 Try Chat2Geo: 
+https://chat2geo.georetina.ai
+
+----
 
 https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
 
