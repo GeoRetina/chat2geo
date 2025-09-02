@@ -1,3 +1,8 @@
+> [!IMPORTANT]  
+> **This repository is archived and no longer maintained.**  
+> Please use the hosted version at [https://chat2geo.georetina.ai](https://chat2geo.georetina.ai), which is production-ready, more feature-rich, and actively maintained.
+
+
 # Chat2Geo: A ChatGPT-Like Web App for Remote-Sensing-Based Geospatial Analysis
 
 Chat2Geo is a Next.js 15 application providing a chatbot-like user interface for performing remote-sensing-based geospatial analyses. It leverages Google Earth Engine (GEE) in the backend to process and analyze various remote sensing datasets in real time. Users can upload their own vector data, run advanced geospatial queries, and integrate the results with an AI Assistant for specialized tasks such as **land cover mapping**, **change detection**, and **air pollutant monitoring**. 
