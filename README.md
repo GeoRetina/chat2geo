@@ -19,6 +19,18 @@ https://chat2geo.georetina.ai
 
 Any other hosted deployment of this legacy repository is not operated, maintained, endorsed, or supported by GeoRetina unless explicitly stated by GeoRetina.
 
+## Trademark And Brand Use
+
+"Chat2Geo", "GeoRetina", and associated names, logos, and brand identifiers are trademarks or brand identifiers of GeoRetina Inc.
+
+The MIT License for this archived repository grants permission to use the legacy source code. It does not grant permission to use the Chat2Geo or GeoRetina names, logos, branding, or product identity to brand, operate, market, or present a fork, derivative work, hosted deployment, or service in a way that suggests affiliation with, sponsorship by, endorsement from, or official operation by GeoRetina.
+
+If you fork, modify, or deploy this legacy code, you must use your own product and service name. You may make truthful, non-misleading attribution such as "based on the legacy Chat2Geo open-source snapshot by GeoRetina," provided it is clear that your project or deployment is independent and not the official Chat2Geo product.
+
+The only official Chat2Geo product operated by GeoRetina is:
+
+https://chat2geo.georetina.ai
+
 ## Status
 
 - Archived and read-only
@@ -71,16 +83,10 @@ Some setup instructions in older versions of this README may no longer be accura
 
 This project relied on Google Earth Engine. Google Earth Engine has its own terms, quota limits, eligibility rules, and commercial-use restrictions. Anyone using this legacy code is responsible for ensuring their own compliance with Google Earth Engine and all other third-party service terms.
 
-## Brand And Affiliation
-
-Chat2Geo and GeoRetina are GeoRetina brand identifiers.
-
-You may use the MIT-licensed code in this repository according to the license terms, but you may not present a fork, clone, deployment, derivative, or hosted instance as the official Chat2Geo product or as affiliated with GeoRetina unless you have explicit permission.
-
-The official Chat2Geo product is available at:
-
-https://chat2geo.georetina.ai
-
 ## Historical Repository
 
-This repository is kept public so prior users can understand the history of the project and so the original MIT-licensed snapshot remains accessible. For the current product, please use the hosted Chat2Geo platform.
+This repository is kept public so prior users can understand the history of the project and so the original MIT-licensed snapshot remains accessible.
+
+For the current product, please use the official hosted Chat2Geo platform:
+
+https://chat2geo.georetina.ai
