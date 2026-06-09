@@ -1,246 +1,86 @@
-> [!IMPORTANT]  
-> **This repository is archived and no longer maintained.**  
-> Please use the hosted version at [https://chat2geo.georetina.ai](https://chat2geo.georetina.ai), which is production-ready, more feature-rich, and actively maintained.
+> [!IMPORTANT]
+> This repository is a legacy open-source snapshot of Chat2Geo.
+>
+> It is archived, read-only, and no longer maintained. The current Chat2Geo product is commercial, actively maintained, and available only at:
+>
+> https://chat2geo.georetina.ai
 
+# Chat2Geo Legacy Open-Source Snapshot
 
-# Chat2Geo: A ChatGPT-Like Web App for Remote-Sensing-Based Geospatial Analysis
+Chat2Geo started as an open-source prototype for AI-assisted geospatial analysis. This repository preserves that early version for historical reference, research, and developers who previously relied on the MIT-licensed code.
 
-Chat2Geo is a Next.js 15 application providing a chatbot-like user interface for performing remote-sensing-based geospatial analyses. It leverages Google Earth Engine (GEE) in the backend to process and analyze various remote sensing datasets in real time. Users can upload their own vector data, run advanced geospatial queries, and integrate the results with an AI Assistant for specialized tasks such as **land cover mapping**, **change detection**, and **air pollutant monitoring**. 
+The current Chat2Geo product has moved beyond this repository and is no longer developed in public. It includes newer features, production infrastructure, reliability work, integrations, and commercial capabilities that are not included here.
 
-Chat2Geo also has advanced knowledge retrieval based on Retrieval-augmented generation (RAG), which can integrate geospatial analysis with non-geospatial/textual information. 
+## Official Product
 
-The app also has authentication and database integrations, making it almost a complete package. 
+Use the official hosted version here:
 
-Chat2Geo inherits a large portion of its building blocks from the GRAI 2.0 app that is under development at GeoRetina (www.georetina.com). In parallel with GRAI 2.0 (which will be merged to Chat2Geo once it's stable), we will also keep Chat2Geo updated for the community.
-
-### 🌍 Try Chat2Geo: 
 https://chat2geo.georetina.ai
 
-----
+Any other hosted deployment of this legacy repository is not operated, maintained, endorsed, or supported by GeoRetina unless explicitly stated by GeoRetina.
 
-https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
+## Status
 
+- Archived and read-only
+- No longer maintained
+- No issues or pull requests are being accepted
+- No setup support is provided
+- Does not represent the current commercial Chat2Geo product
+- May contain outdated dependencies, incomplete features, and known or unknown bugs
 
+## License
 
-## Contributing 🛠️
+The code in this archived repository remains available under the MIT License for the version published here.
 
- - If you're interested in contributing to this project, please contact us at `shahabj.github@gmail.com`.
- - If you are a new contributor, please first check out our [Contributing Guidelines](./CONTRIBUTING.md) to get started.
+The MIT License applies only to this legacy open-source snapshot. It does not grant access to, rights in, or permission to use any current private Chat2Geo code, hosted services, production infrastructure, commercial features, proprietary assets, datasets, API keys, service credentials, or deployment environments.
 
+Third-party forks or deployments must preserve the required copyright and license notices. They must not imply affiliation with, endorsement by, or official operation by GeoRetina.
 
-## Table of Contents
+## About The Legacy Version
 
-- [Features](#features-)
-- [Tech Stack](#tech-stack-)
-- [Getting Started](#getting-started-)
-- [Current Analyses](#available-geospatial-analyses-)
-- [Considerations](#considerations)
+This early version provided a ChatGPT-like interface for remote-sensing-based geospatial analysis. It used Google Earth Engine and related geospatial tooling to support workflows such as:
 
----
+- Natural-language geospatial analysis
+- Google Earth Engine-backed remote sensing workflows
+- Vector upload and analysis
+- Land cover mapping
+- Land-use and land-cover change detection
+- Urban heat island analysis
+- Early RAG and document-based knowledge features
+- Supabase-backed authentication and storage experiments
 
-## Features ✨
+This version was experimental and was not production-ready.
 
-1. **Chat-Style Interface**
+## Technical Notes
 
-   - Interact with the system using natural language.
-   - The AI Assistant can execute various **geospatial functions** on your behalf.
+The legacy stack included:
 
-2. **Google Earth Engine Integration**
-
-   - Real-time access to satellite imagery and remote sensing datasets.
-   - Seamless backend processing for large-scale geospatial computations.
-
-3. **Import Your Own Vector Data**
-
-   - Upload and manage personal vector layers.
-   - Integrate your data with Earth Engine operations for advanced queries.
-
-4. **Analysis Toolkit**
-
-   - **Air Pollutants**
-   - **Urban Heat Island (UHI)** metrics
-   - **Land Cover** mapping & **Change Detection**
-   - Custom AI models deployed on **Vertex AI** for certain land cover tasks
-
-5. **RAG & Knowledge Base**
-   - Enables a Retrieval-Augmented Generation (RAG) workflow.
-   - Upload documents to build a local knowledge base.
-   - The AI Assistant can then combine geospatial insights with custom document knowledge.
-
-
-## Tech Stack 💻
 - Next.js
-- Google Cloud Platform (GCP):
-   - Google Earth Engine (remote-sensing data invocation and processing)
-   - Vertex AI (custom AI vision models)
-   - Cloud Run
-- Vercel AI
-- OpenAI (ChatGPT API)
-- Supabase (database and authentication)
-- LangChain (RAG)
-- Turf (for spatial operations)
-- Maplibre GL (for displaying maps)
+- Google Earth Engine
+- Google Cloud Platform
+- Vertex AI
+- Supabase
+- OpenAI / Vercel AI SDK
+- LangChain
+- Turf
+- MapLibre GL
 
-## Getting Started 🚀
+Some setup instructions in older versions of this README may no longer be accurate. Required cloud services, credentials, APIs, and third-party plans may have changed since this repository was active.
 
-1. Clone the repo
+## Google Earth Engine Notice
 
-2. Install dependencies
+This project relied on Google Earth Engine. Google Earth Engine has its own terms, quota limits, eligibility rules, and commercial-use restrictions. Anyone using this legacy code is responsible for ensuring their own compliance with Google Earth Engine and all other third-party service terms.
 
-   ```bash
-   npm install
-   ```
+## Brand And Affiliation
 
-3. Create a Google Earth Engine (GEE) account and project, otherwise no analysis can be done. Note that GEE is currently only free for non-commercial use:
-   - https://earthengine.google.com
-   
-5. Set up the environment variables
+Chat2Geo and GeoRetina are GeoRetina brand identifiers.
 
-- Create a `.env.local` file (or similar) with the required credentials for:
+You may use the MIT-licensed code in this repository according to the license terms, but you may not present a fork, clone, deployment, derivative, or hosted instance as the official Chat2Geo product or as affiliated with GeoRetina unless you have explicit permission.
 
-  - Your base url:
-     ```
-     BASE_URL=http://localhost:3000   # Change it if you're using a different port. In production, you should set it to the url of the deployment. 
-     ```
-  - Google Cloud Platform (GCP):
-    ```
-      GOOGLE_MAPS_API_KEY=           # API key for Google maps. You can replace Google Maps with OSM if you want.
-      VERTEXTAI_ENDPOINT_BASE_URL=   # Base URL if you use your own custom models.
-      GEE_CLOUD_RUN_URL=             # URL for invoking a model hosted on VertexAI using cloud functions.
-      GCP_BUCKET_NAME=               # Bucket name to store the land-cover map generated by your custom model (if applicable).
-      GCP_SERVICE_ACCOUNT_KEY=       # Service Account key needed for GEE functions, depending on your GCP configurations. Make sure it has all the required permissions to use GEE.
-    ```
+The official Chat2Geo product is available at:
 
-  - Large Language Model (LLM) API Key:
-    ```
-    OPENAI_API_KEY=            # It shouldn't be necessarily OpenAI, thought. You can change it to any other API supported by Vercel AI SDK. However, you need to make some changes to the Chat API route.
-    ```
-  - For the database & authentication, the app uses Supabase. So you need the Supabase API keys as well:
+https://chat2geo.georetina.ai
 
-        NEXT_PUBLIC_SUPABASE_URL=
-        NEXT_PUBLIC_SUPABASE_ANON_KEY=
+## Historical Repository
 
-  - If you want Esri integration, you also need the following keys in your env (skip this part if you don't want this integration):
-
-        ARCGIS_CLIENT_ID=
-        ARCGIS_CLIENT_SECRET=
-        ARCGIS_REDIRECT_URI=
-
-- For feedback submission, I just used a simple email-based pipeline based on Mailgun (skip this part if you don't want this feature):
-
-        MAILGUN_API_KEY=
-        MAILGUN_DOMAIN=
-        RECIPIENT_EMAIL=
-        SENDER_EMAIL=
-
-5. Run the develpment server
-
-       npm run dev
-
-
-Visit http://localhost:3000 to view the application.
-
-
-<a name="custom_anchor_name"></a>
-## How to Set up Supabase Database, Storage Bucket, & Authentication 🛢️
-
-Supabase has a free-tier, generous plan that you can use to work with the app.
-
-As mentioned above, the database (PostgreSQL) and authentication are both hosted on Supabase. To set up them, you can either use the local dev (https://supabase.com/docs/guides/local-development/cli/getting-started) or online (https://supabase.com/docs/guides/database/overview).
-To set up the database and Supabase auth online, you need to create a supabase project & create the required databases and auth. 
-You can find the database schema of the app in the `db-schema` folder.
-
-If you want to also use the Knowledge Base feature, you need to create a storage bucket on Supabase as well. The name of the bucket should be `documents_bucket`. This is where the PDF docs you upload to the Knowledge Base are stored. You can set up the bucket by going to the following link:
- - https://supabase.com/dashboard/project/_/storage/buckets
-
-## Available Geospatial Analyses 📊
-
-The app includes the following geospatial analyses:
-
-| #  | Analysis Type                                    | Description |
-|----|------------------------------------------------|-------------|
-| 1  | **Urban Heat Island (UHI) Analysis**           | Evaluates temperature variations in urban areas compared to rural surroundings. |
-| 2  | **Land-Use/Land-Cover Mapping**                | Uses Google DynamicWorld to classify land cover types. |
-| 3  | **Land-Use/Land-Cover Change Mapping**         | Detects changes in land use over time using Google DynamicWorld. |
-| 4  | **Air Pollution Analysis** *(Not fully implemented)* | Analyzes air pollution patterns and trends. |
-
-
-
-
-## Considerations💡
-- Note that all remote-sensing geospatial analyses, at least for now, are based on GEE in this app. So, if you don't set up your GEE environment correctly, no analysis can be done.
-- It should be noted that this app is not yet ready for production. The app has known bugs, and perhaps unknown ones 😁 Some functionalities have not been implemented yet.
-- I may have forgotten to include some steps in setting up the app! 😅 If there's missing information in the instructions, please open an issue and let me know to update the instructions accordingly.
-- GEE-based geospatial analyses are just simple examples of how such analyses can be implemented and added. Some of them are using data that may not be up-to-date. As a result, care should be taken while interpreting the results.
-- There are parts that should be refactored or re-designed either because they could have been used/invoked in a better place, or because they should've been implemented in a much better manner.
-
-
-## Frequently Asked Questions (FAQ) 📌
-
-<details>
-  <summary>🔹 General Questions</summary>
-  
-  **❓ Is this project free to use?**  
-  *Yes! This open-source version is free to use under the terms of its license. However, note that Google Earth Engine has restrictions on commercial usage.*
-  
-</details>
-
-<details>
-  <summary>🔹 Support &amp; Contributions</summary>
-  
-  **❓ How can I get support for issues?**  
-  - *If you encounter a bug or have a feature request, please [open an issue](../../issues) on GitHub.*  
-  - *Be as detailed as possible when describing your issue (include screenshots, step-by-step explanations, error logs, and any relevant details). Abstract or vague questions will not be answered.*  
-  - *For other questions, feel free to reach out at [shahabj.github@gmail.com](mailto:shahabj.github@gmail.com).*
-  
-  **❓ How can I contribute?**  
-  *We welcome contributions! Please check out the [Contributing Guidelines](./CONTRIBUTING.md) before submitting a pull request or opening an issue. Your help in improving this project is greatly appreciated.*
-  
-</details>
-
-<details>
-  <summary>🔹 Features &amp; Customization</summary>
-  
-  **❓ Can I request additional analyses or features?**  
-  *Absolutely! You can:*
-  - *Suggest a feature by opening an issue.*
-  - *Fork the repository and implement your own changes.*  
-  *For advanced or custom solutions, please see [GRAI 2.0 (Enterprise Version)](#enterprise-version-grai-20) below.*
-  
-  **❓ Can I use my own geospatial datasets?**  
-  *Yes! The app allows you to import vector data and integrate it with Google Earth Engine for custom analyses. For raster data, at least for now, you need to either host them on GEE or a GCP bucket.*
-  
-</details>
-
-<details>
-  <summary>🔹 Enterprise Version: GRAI 2.0</summary>
-  
-  **❓ What is GRAI 2.0?**  
-  *GRAI 2.0 is the enterprise version of this project, offering:*
-  - *Custom-built solutions tailored to specific client needs.*
-  - *Additional analyses &amp; AI models not included in the open-source version.*
-  - *Continuous updates &amp; premium support.*
-  
-  **❓ How do I get access to GRAI 2.0?**  
-  *For enterprise inquiries, please visit the [GeoRetina Contact Page](https://www.georetina.com/contact).*
-  
-</details>
-
-<details>
-  <summary>🔹 Technical &amp; Setup Questions</summary>
-  
-  **❓ I'm facing issues with setup. What should I do?**  
-  1. *Check that your environment variables are properly set in `.env.local`.*
-  2. *To get past the login page, you need to first set up a Supabase Auth as described in [Supabase Setup](#how-to-set-up-supabase-database-storage-bucket--authentication-%EF%B8%8F).*
-  3. *Check your database configurations.*
-  4. *Confirm your Google Earth Engine configuration.*
-  5. *Refer to the [Getting Started](#getting-started) section in this README.*
-  6. *If issues persist, [open an issue](../../issues).*
-  
-</details>
-
-*Have a question not listed here? Feel free to [open an issue](../../issues) or reach out via email!* 🚀
-
-
-
-
+This repository is kept public so prior users can understand the history of the project and so the original MIT-licensed snapshot remains accessible. For the current product, please use the hosted Chat2Geo platform.
